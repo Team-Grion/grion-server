@@ -1,9 +1,10 @@
 plugins {
-    kotlin("jvm") version "2.2.21"
-    kotlin("plugin.spring") version "2.2.21"
-    id("org.springframework.boot") version "4.0.5"
+    kotlin("jvm") version "1.9.22"
+    kotlin("plugin.spring") version "1.9.22"
+    id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.jpa") version "2.2.21"
+    kotlin("plugin.jpa") version "1.9.22"
+    kotlin("plugin.allopen") version "1.9.22"
 }
 
 group = "com.project"
@@ -23,6 +24,7 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.mysql:mysql-connector-j")

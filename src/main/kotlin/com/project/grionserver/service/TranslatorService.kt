@@ -1,5 +1,6 @@
 package com.project.grionserver.service
 
+import com.deepl.api.DeepLClient
 import com.deepl.api.Translator
 import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Value
@@ -11,10 +12,9 @@ class TranslatorService(
 ) {
     private lateinit var translator: Translator
 
-    @Suppress("DEPRECATION")
     @PostConstruct
     fun init() {
-        translator = Translator(authKey)
+        translator = DeepLClient(authKey)
     }
 
     fun translate(text: String): String {

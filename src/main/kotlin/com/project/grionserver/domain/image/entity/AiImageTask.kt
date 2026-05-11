@@ -1,4 +1,4 @@
-package com.project.grionserver.domain.create.entity
+package com.project.grionserver.domain.image.entity
 
 import com.project.grionserver.domain.common.entity.BaseTimeEntity
 import com.project.grionserver.domain.pet.entity.Pet
@@ -7,7 +7,7 @@ import org.hibernate.annotations.Comment
 
 @Entity
 @Table(name = "ai_image_task")
-class CreateImageTask(
+class AiImageTask(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     @Comment("작업 PK")

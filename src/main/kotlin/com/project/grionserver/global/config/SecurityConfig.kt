@@ -1,4 +1,4 @@
-package com.project.grionserver.config
+package com.project.grionserver.global.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

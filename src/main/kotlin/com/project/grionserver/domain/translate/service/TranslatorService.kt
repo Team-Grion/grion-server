@@ -1,4 +1,4 @@
-package com.project.grionserver.service
+package com.project.grionserver.domain.translate.service
 
 import com.deepl.api.DeepLClient
 import com.deepl.api.Translator
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class TranslatorService(
-    @Value($$"${deepl.api.key}") private val authKey: String
+    @Value("\${deepl.api.key}") private val authKey: String
 ) {
     private lateinit var translator: Translator
 

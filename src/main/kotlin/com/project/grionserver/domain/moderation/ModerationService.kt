@@ -12,7 +12,7 @@ class ModerationService(
     @Value("\${openai.api.url}") private val apiUrl: String
 ) {
     private val restClient = RestClient.builder().build()
-    
+
     fun isViolated(text: String): Boolean {
         try {
             val response = restClient.post()
@@ -24,10 +24,10 @@ class ModerationService(
                 .body(ModerationResponseDto::class.java)
 
             // flagged 추출
-            return response?.results?.firstOrNull()?.flagged ?: false
+            return response?.results?.firstOrNull()?.flagged ?: true
         } catch (e: Exception) {
-            println("Moderation API 호출 실패: ${e.message}")
-            return false
+            e.printStackTrace()
+            return true
         }
     }
 }

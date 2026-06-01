@@ -1,7 +1,7 @@
-package com.project.grionserver.controller
+package com.project.grionserver.domain.translate.controller
 
-import com.project.grionserver.dto.internal.TranslationRequest
-import com.project.grionserver.service.TranslatorService
+import com.project.grionserver.domain.translate.dto.internal.TranslationRequest
+import com.project.grionserver.domain.translate.service.TranslatorService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping

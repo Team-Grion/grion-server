@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface AiImageTaskRepository : JpaRepository<AiImageTask, Long> {
     // 특정 반려동물의 AI 작업 상태 확인
-    fun findByPet(pet: Pet): AiImageTask?
+    fun findFirstByPetOrderByIdDesc(pet: Pet): AiImageTask?
 
     // 아직 처리되지 않은 작업들 조회
     fun findAllByStatus(status: String): List<AiImageTask>

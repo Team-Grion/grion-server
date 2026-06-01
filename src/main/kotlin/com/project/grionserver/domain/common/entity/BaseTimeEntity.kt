@@ -20,7 +20,7 @@ abstract class BaseTimeEntity {
         columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP",
     )
     @Comment("생성 일시")
-    var createdAt: LocalDateTime = LocalDateTime.now()
+    var createdAt: LocalDateTime? = null
         protected set
 
     @LastModifiedDate
@@ -30,7 +30,7 @@ abstract class BaseTimeEntity {
         columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
     )
     @Comment("수정 일시")
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: LocalDateTime? = null
         protected set
 }
 
@@ -46,6 +46,6 @@ abstract class BaseCreatedAtEntity {
         columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP",
     )
     @Comment("생성 일시")
-    var createdAt: LocalDateTime = LocalDateTime.now()
+    var createdAt: LocalDateTime? = null
         protected set
 }

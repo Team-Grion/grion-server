@@ -22,9 +22,13 @@ class Pet(
     @Comment("반려동물 이름")
     var name: String,
 
+    @Column(name = "birth_date")
+    @Comment("반려동물 생일")
+    var birthday: LocalDate? = null,
+
     @Column(name = "death_date", nullable = false)
     @Comment("이별한 날짜")
-    var deathDate: LocalDate,
+    var deathDate: LocalDate? = null,
 
     @Column(name = "species", nullable = false, length = 20)
     @Comment("반려동물 종 (강아지, 고양이 등)")
@@ -36,11 +40,11 @@ class Pet(
 
     @Column(name = "characteristics", nullable = false, length = 255)
     @Comment("반려동물의 특징")
-    var characteristics: String,
+    var characteristics: String? = null,
 
     @Column(name = "background_text", nullable = false, length = 255)
     @Comment("추모 페이지 배경 설명")
-    var backgroundText: String,
+    var backgroundText: String? = null,
 
     @Column(name = "memories", columnDefinition = "TEXT")
     @Comment("반려동물과의 추억 기록")

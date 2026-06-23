@@ -25,6 +25,10 @@ class AiImageTask(
     @Comment("작업 상태 (PENDING, SUCCESS, FAIL)")
     var status: String,
 
+    @Column(name = "result_url", columnDefinition = "TEXT")
+    @Comment("AI 편집 결과 이미지 URL")
+    var resultUrl: String? = null,
+
     @Column(name = "failure_reason", columnDefinition = "TEXT")
     @Comment("실패 사유")
     var failureReason: String? = null

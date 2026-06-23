@@ -14,9 +14,10 @@ class FluxController(private val fluxService: FluxService) {
     @PostMapping("/edit", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun editImage(
         @RequestPart("image") image: MultipartFile,
-        @RequestPart("prompt") prompt: String
+        @RequestPart("prompt") prompt: String,
+        @RequestParam petId: Long
     ): ResponseEntity<FluxEditResponse> {
-        val editedUrl = fluxService.uploadAndEdit(image, prompt)
+        val editedUrl = fluxService.uploadAndEdit(image, prompt, petId)
         return ResponseEntity.ok(FluxEditResponse(editedUrl))
     }
 }

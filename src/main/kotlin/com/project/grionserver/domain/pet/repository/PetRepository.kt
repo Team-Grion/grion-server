@@ -11,5 +11,5 @@ interface PetRepository : JpaRepository<Pet, Long> {
     fun findAllByUser(user: User): List<Pet>
 
     // 공개된 추모 페이지 목록 조회
-    fun findAllBySharedTrue(): List<Pet>
+    fun findAllByIsSharedTrue(): List<Pet>
 }

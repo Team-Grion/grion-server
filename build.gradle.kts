@@ -37,6 +37,9 @@ dependencies {
     // DeepL library
     implementation("com.deepl.api:deepl-java:1.15.0")
 
+    // Flux AI
+    implementation("ai.fal.client:fal-client-kotlin:0.7.1")
+
     // HTTP
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

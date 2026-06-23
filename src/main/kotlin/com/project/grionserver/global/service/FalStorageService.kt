@@ -13,19 +13,19 @@ class FalStorageService(
     private val restTemplate = RestTemplate()
 
     fun upload(file: MultipartFile): String {
-        val headers = HttpHeaders().apply {
+        val authHeaders = HttpHeaders().apply {
             contentType = MediaType.APPLICATION_JSON
             set("Authorization", "Key $falApiKey")
         }
 
+        // 1단계: presigned URL 요청
         val initiateBody = mapOf(
-            "file_name" to (file.originalFilename ?: "image.jpg"),
-            "content_type" to (file.contentType ?: "image/jpeg")
+            "content_type" to (file.contentType ?: "image/jpeg"),
+            "file_name" to (file.originalFilename ?: "image.jpg")
         )
-
         val initiateResponse = restTemplate.postForEntity(
             "https://rest.alpha.fal.ai/storage/upload/initiate",
-            HttpEntity(initiateBody, headers),
+            HttpEntity(initiateBody, authHeaders),
             Map::class.java
         )
 
@@ -35,16 +35,17 @@ class FalStorageService(
 
         val uploadUrl = body["upload_url"] as? String
             ?: throw RuntimeException("업로드 URL 획득 실패")
-        val storageUrl = body["storage_url"] as? String
+        val storageUrl = body["file_url"] as? String
             ?: throw RuntimeException("스토리지 URL 획득 실패")
 
-        val putHeaders = HttpHeaders().apply {
+        // 2단계: presigned URL로 파일 업로드
+        val uploadHeaders = HttpHeaders().apply {
             contentType = MediaType.parseMediaType(file.contentType ?: "image/jpeg")
         }
         restTemplate.exchange(
             uploadUrl,
             HttpMethod.PUT,
-            HttpEntity(file.bytes, putHeaders),
+            HttpEntity(file.bytes, uploadHeaders),
             String::class.java
         )
 

@@ -13,7 +13,9 @@ class SecurityConfig {
         http
             .csrf { it.disable() }
             .authorizeHttpRequests { auth ->
-                auth.anyRequest().authenticated()
+                auth
+                    .requestMatchers("/flux/**", "/pet/**").permitAll()
+                    .anyRequest().authenticated()
             }
             .httpBasic { }
 

@@ -32,4 +32,4 @@ class AiImageTask(
     @Column(name = "failure_reason", columnDefinition = "TEXT")
     @Comment("실패 사유")
     var failureReason: String? = null
-) : BaseTimeEntity()
+) : BaseTimeEntity() 

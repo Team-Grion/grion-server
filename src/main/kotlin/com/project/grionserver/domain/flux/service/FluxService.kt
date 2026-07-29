@@ -60,7 +60,7 @@ class FluxService(
         }
     }
 
-    private fun editImage(prompt: String, imageUrl: String): String? {
+    fun editImage(prompt: String, imageUrl: String): String? {
         val headers = HttpHeaders().apply {
             contentType = MediaType.APPLICATION_JSON
             set("Authorization", "Key $fluxKey")

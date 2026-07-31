@@ -30,9 +30,10 @@ class Pet(
     @Comment("이별한 날짜")
     var deathDate: LocalDate? = null,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "species", nullable = false, length = 20)
-    @Comment("반려동물 종 (강아지, 고양이 등)")
-    var species: String,
+    @Comment("반려동물 종 (CAT, DOG)")
+    var species: Species,
 
     @Column(name = "breed", nullable = false, length = 50)
     @Comment("상세 품종")

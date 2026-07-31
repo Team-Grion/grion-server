@@ -8,6 +8,7 @@ import com.project.grionserver.domain.image.repository.PetImageRepository
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
 import com.project.grionserver.domain.pet.entity.Pet
+import com.project.grionserver.domain.pet.entity.Species
 import com.project.grionserver.domain.pet.repository.PetRepository
 import com.project.grionserver.domain.user.repository.UserRepository
 import com.project.grionserver.global.service.FalStorageService
@@ -32,11 +33,12 @@ class PetService(
             .orElseThrow { IllegalArgumentException("사용자를 찾을 수 없습니다.") }
 
         val imageUrl = falStorageService.upload(image)
+        val species = Species.fromString(request.species)
 
         val pet = petRepository.save(
             Pet(
                 user = user,
-                species = request.species,
+                species = species,
                 breed = request.breed,
                 personalities = request.personalities.toMutableList(),
                 backgroundText = request.background
@@ -59,15 +61,18 @@ class PetService(
             AiImageGenerationRequestedEvent(
                 taskId = task.id,
                 sourceImageUrl = imageUrl,
-                prompt = buildPrompt(request)
+                prompt = buildPrompt(species, request)
             )
         )
 
         return PetCreateResponse(petId = pet.id, status = task.status)
     }
 
-    private fun buildPrompt(request: PetCreateRequest): String {
-        val speciesText = if (request.species == "CAT") "고양이" else "강아지"
+    private fun buildPrompt(species: Species, request: PetCreateRequest): String {
+        val speciesText = when (species) {
+            Species.CAT -> "고양이"
+            Species.DOG -> "강아지"
+        }
         val personalityText = request.personalities.joinToString(", ")
         return "품종이 ${request.breed}인 ${speciesText}이미지를 생성해줘. " +
             "성격은 ${personalityText}. 배경은 ${request.background}."

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
-@RequestMapping("/api/internal/translation")
+@RequestMapping("/internal/translation")
 class TranslationController(
     private val translatorService: TranslatorService,
 ) {

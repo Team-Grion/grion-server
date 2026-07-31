@@ -5,8 +5,10 @@ import com.project.grionserver.domain.image.entity.PetImage
 import com.project.grionserver.domain.image.event.AiImageGenerationRequestedEvent
 import com.project.grionserver.domain.image.repository.AiImageTaskRepository
 import com.project.grionserver.domain.image.repository.PetImageRepository
+import com.project.grionserver.domain.message.repository.MessageRepository
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
+import com.project.grionserver.domain.pet.dto.PetMemorialDetailResponse
 import com.project.grionserver.domain.pet.entity.Pet
 import com.project.grionserver.domain.pet.entity.Species
 import com.project.grionserver.domain.pet.repository.PetRepository
@@ -26,6 +28,7 @@ class PetService(
     private val userRepository: UserRepository,
     private val falStorageService: FalStorageService,
     private val aiImageTaskRepository: AiImageTaskRepository,
+    private val messageRepository: MessageRepository,
     private val eventPublisher: ApplicationEventPublisher
 ) {
     fun createPet(image: MultipartFile, request: PetCreateRequest): PetCreateResponse {
@@ -66,6 +69,25 @@ class PetService(
         )
 
         return PetCreateResponse(petId = pet.id, status = task.status)
+    }
+
+    fun getMyPetDetail(petId: Long): PetMemorialDetailResponse {
+        val pet = petRepository.findById(petId)
+            .orElseThrow { IllegalArgumentException("반려동물을 찾을 수 없습니다.") }
+
+        val task = aiImageTaskRepository.findFirstByPetOrderByIdDesc(pet)
+        val letterCount = messageRepository.countByPet(pet) // Todo: 추후 승인된 메시지만 계산
+
+        return PetMemorialDetailResponse(
+            petId = pet.id,
+            petName = pet.name,
+            aiImageUrl = task?.resultUrl,
+            birthDate = pet.birthday,
+            deathDate = pet.deathDate,
+            letterCount = letterCount,
+            content = pet.memories,
+            isPublic = pet.isShared
+        )
     }
 
     private fun buildPrompt(species: Species, request: PetCreateRequest): String {

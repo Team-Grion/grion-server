@@ -70,6 +70,10 @@ class PetService(
     }
 
     fun addPetInfo(petId: Long, request: PetAdditionalInfoRequest) {
+        require(!request.deathDate.isBefore(request.birthDate)) {
+            "기일은 생일보다 빠를 수 없습니다."
+        }
+
         val pet = petRepository.findById(petId)
             .orElseThrow { IllegalArgumentException("반려동물을 찾을 수 없습니다.") }
 

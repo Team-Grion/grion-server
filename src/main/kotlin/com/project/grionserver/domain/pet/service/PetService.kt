@@ -71,7 +71,7 @@ class PetService(
         return PetCreateResponse(petId = pet.id, status = task.status)
     }
 
-    fun getMyPetDetail(petId: Long): PetMemorialDetailResponse {
+    fun getMemorialDetail(petId: Long): PetMemorialDetailResponse {
         val pet = petRepository.findById(petId)
             .orElseThrow { IllegalArgumentException("반려동물을 찾을 수 없습니다.") }
 

@@ -5,6 +5,7 @@ import com.project.grionserver.domain.image.entity.PetImage
 import com.project.grionserver.domain.image.event.AiImageGenerationRequestedEvent
 import com.project.grionserver.domain.image.repository.AiImageTaskRepository
 import com.project.grionserver.domain.image.repository.PetImageRepository
+import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
 import com.project.grionserver.domain.pet.entity.Pet
@@ -66,6 +67,16 @@ class PetService(
         )
 
         return PetCreateResponse(petId = pet.id, status = task.status)
+    }
+
+    fun addPetInfo(petId: Long, request: PetAdditionalInfoRequest) {
+        val pet = petRepository.findById(petId)
+            .orElseThrow { IllegalArgumentException("반려동물을 찾을 수 없습니다.") }
+
+        pet.name = request.petName
+        pet.birthday = request.birthDate
+        pet.deathDate = request.deathDate
+        pet.memories = request.memory
     }
 
     private fun buildPrompt(species: Species, request: PetCreateRequest): String {

@@ -51,7 +51,7 @@ class PetService(
             AiImageTask(
                 pet = pet,
                 requestId = UUID.randomUUID().toString(),
-                status = "PROCESSING"
+                status = "PENDING"
             )
         )
 

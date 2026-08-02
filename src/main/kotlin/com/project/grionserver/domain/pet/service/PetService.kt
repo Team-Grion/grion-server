@@ -10,6 +10,9 @@ import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialDetailResponse
 import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
+import com.project.grionserver.domain.pet.dto.PetMemorialPublicListResponse
+import com.project.grionserver.domain.pet.dto.PetMemorialPublicSummary
+import com.project.grionserver.domain.pet.dto.PetMemorialPublicTodaySummary
 import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.entity.Pet
 import com.project.grionserver.domain.pet.entity.Species
@@ -21,6 +24,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDate
 import java.util.UUID
 
 @Service
@@ -126,5 +130,39 @@ class PetService(
             ?: throw IllegalArgumentException("진행 중인 작업을 찾을 수 없습니다.")
 
         return PetStatusResponse(status = task.status)
+    }
+
+    fun getPublicMemorials(species: String): PetMemorialPublicListResponse {
+        val pets = if (species.equals("ALL", ignoreCase = true)) {
+            petRepository.findAllByIsSharedTrue()
+        } else {
+            petRepository.findAllByIsSharedTrueAndSpecies(Species.fromString(species))
+        }
+
+        val startOfToday = LocalDate.now().atStartOfDay()
+        val startOfTomorrow = startOfToday.plusDays(1)
+
+        val content = pets.map { pet ->
+            val task = aiImageTaskRepository.findFirstByPetOrderByIdDesc(pet)
+
+            PetMemorialPublicSummary(
+                petId = pet.id,
+                petName = pet.name,
+                aiImageUrl = task?.resultUrl,
+                birthDate = pet.birthday,
+                deathDate = pet.deathDate,
+                introduction = pet.backgroundText,
+                personalities = pet.personalities,
+                todayMessageCount = messageRepository.countByPetAndCreatedAtBetween(pet, startOfToday, startOfTomorrow),
+                totalMessageCount = messageRepository.countByPet(pet)
+            )
+        }
+
+        val todaySummary = PetMemorialPublicTodaySummary(
+            memorialCount = petRepository.countByIsSharedTrueAndCreatedAtBetween(startOfToday, startOfTomorrow),
+            messageCount = messageRepository.countTodayMessagesForPublicMemorials(startOfToday, startOfTomorrow)
+        )
+
+        return PetMemorialPublicListResponse(todaySummary = todaySummary, content = content)
     }
 }

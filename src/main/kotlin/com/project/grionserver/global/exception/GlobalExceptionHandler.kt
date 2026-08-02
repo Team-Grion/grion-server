@@ -9,6 +9,7 @@ import org.springframework.web.bind.MissingRequestHeaderException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import org.springframework.web.multipart.support.MissingServletRequestPartException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -55,6 +56,13 @@ class GlobalExceptionHandler {
         val statusCode = HttpStatus.BAD_REQUEST.value()
         return ResponseEntity.status(statusCode)
             .body(ApiResponse.fail("요청 파라미터 형식이 올바르지 않습니다: ${e.name}", statusCode))
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException::class)
+    fun handleMissingServletRequestPartException(e: MissingServletRequestPartException): ResponseEntity<ApiResponse<Unit?>> {
+        val statusCode = HttpStatus.BAD_REQUEST.value()
+        return ResponseEntity.status(statusCode)
+            .body(ApiResponse.fail("필수 요청 파트가 누락되었습니다: ${e.requestPartName}", statusCode))
     }
 
     @ExceptionHandler(Exception::class)

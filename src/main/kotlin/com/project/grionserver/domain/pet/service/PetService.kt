@@ -5,6 +5,7 @@ import com.project.grionserver.domain.image.entity.PetImage
 import com.project.grionserver.domain.image.event.AiImageGenerationRequestedEvent
 import com.project.grionserver.domain.image.repository.AiImageTaskRepository
 import com.project.grionserver.domain.image.repository.PetImageRepository
+import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
 import com.project.grionserver.domain.pet.dto.PetStatusResponse
@@ -12,6 +13,7 @@ import com.project.grionserver.domain.pet.entity.Pet
 import com.project.grionserver.domain.pet.entity.Species
 import com.project.grionserver.domain.pet.repository.PetRepository
 import com.project.grionserver.domain.user.repository.UserRepository
+import com.project.grionserver.global.exception.NotFoundException
 import com.project.grionserver.global.service.FalStorageService
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -31,7 +33,7 @@ class PetService(
 ) {
     fun createPet(image: MultipartFile, request: PetCreateRequest): PetCreateResponse {
         val user = userRepository.findById(request.userId)
-            .orElseThrow { IllegalArgumentException("사용자를 찾을 수 없습니다.") }
+            .orElseThrow { NotFoundException("사용자를 찾을 수 없습니다.") }
 
         val imageUrl = falStorageService.upload(image)
         val species = Species.fromString(request.species)
@@ -69,14 +71,18 @@ class PetService(
         return PetCreateResponse(petId = pet.id, status = task.status)
     }
 
-    fun getPetStatus(petId: Long): PetStatusResponse {
+    fun addPetInfo(petId: Long, request: PetAdditionalInfoRequest) {
+        require(!request.deathDate.isBefore(request.birthDate)) {
+            "기일은 생일보다 빠를 수 없습니다."
+        }
+
         val pet = petRepository.findById(petId)
-            .orElseThrow { IllegalArgumentException("반려동물을 찾을 수 없습니다.") }
+            .orElseThrow { NotFoundException("반려동물을 찾을 수 없습니다.") }
 
-        val task = aiImageTaskRepository.findFirstByPetOrderByIdDesc(pet)
-            ?: throw IllegalArgumentException("진행 중인 작업을 찾을 수 없습니다.")
-
-        return PetStatusResponse(status = task.status)
+        pet.name = request.petName
+        pet.birthday = request.birthDate
+        pet.deathDate = request.deathDate
+        pet.memories = request.memory
     }
 
     private fun buildPrompt(species: Species, request: PetCreateRequest): String {
@@ -87,5 +93,15 @@ class PetService(
         val personalityText = request.personalities.joinToString(", ")
         return "품종이 ${request.breed}인 ${speciesText}이미지를 생성해줘. " +
             "성격은 ${personalityText}. 배경은 ${request.background}."
+    }
+
+    fun getPetStatus(petId: Long): PetStatusResponse {
+        val pet = petRepository.findById(petId)
+            .orElseThrow { IllegalArgumentException("반려동물을 찾을 수 없습니다.") }
+
+        val task = aiImageTaskRepository.findFirstByPetOrderByIdDesc(pet)
+            ?: throw IllegalArgumentException("진행 중인 작업을 찾을 수 없습니다.")
+
+        return PetStatusResponse(status = task.status)
     }
 }

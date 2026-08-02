@@ -5,6 +5,7 @@ import com.project.grionserver.domain.image.entity.PetImage
 import com.project.grionserver.domain.image.repository.AiImageTaskRepository
 import com.project.grionserver.domain.image.repository.PetImageRepository
 import com.project.grionserver.domain.pet.repository.PetRepository
+import com.project.grionserver.global.exception.NotFoundException
 import com.project.grionserver.global.service.FalStorageService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
@@ -29,7 +30,7 @@ class FluxService(
 
     fun uploadAndEdit(image: MultipartFile, prompt: String, petId: Long): String {
         val pet = petRepository.findById(petId)
-            .orElseThrow { IllegalArgumentException("반려동물을 찾을 수 없습니다.") }
+            .orElseThrow { NotFoundException("반려동물을 찾을 수 없습니다.") }
 
         val imageUrl = falStorageService.upload(image)
 

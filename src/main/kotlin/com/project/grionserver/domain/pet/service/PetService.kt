@@ -8,6 +8,8 @@ import com.project.grionserver.domain.image.repository.PetImageRepository
 import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
+import com.project.grionserver.domain.pet.dto.PetPrivateMemorialListResponse
+import com.project.grionserver.domain.pet.dto.PetPrivateMemorialSummary
 import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.entity.Pet
 import com.project.grionserver.domain.pet.entity.Species
@@ -103,5 +105,24 @@ class PetService(
             ?: throw IllegalArgumentException("진행 중인 작업을 찾을 수 없습니다.")
 
         return PetStatusResponse(status = task.status)
+    }
+
+    fun getMyMemorials(userId: Long): PetPrivateMemorialListResponse {
+        val user = userRepository.findById(userId)
+            .orElseThrow { NotFoundException("사용자를 찾을 수 없습니다.") }
+
+        val memorials = petRepository.findAllByUser(user).map { pet ->
+            val aiImageUrl = petImageRepository.findAllByPet(pet)
+                .firstOrNull { !it.isMain }
+                ?.imageUrl
+
+            PetPrivateMemorialSummary(
+                petId = pet.id,
+                petName = pet.name,
+                aiImageUrl = aiImageUrl
+            )
+        }
+
+        return PetPrivateMemorialListResponse(memorials = memorials)
     }
 }

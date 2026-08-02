@@ -3,6 +3,7 @@ package com.project.grionserver.domain.pet.controller
 import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
+import com.project.grionserver.domain.pet.dto.PetPrivateMemorialListResponse
 import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.service.PetService
 import com.project.grionserver.global.response.ApiResponse
@@ -53,6 +54,15 @@ class PetController(private val petService: PetService) {
         @PathVariable petId: Long
     ): ResponseEntity<ApiResponse<PetStatusResponse>> {
         val response = petService.getPetStatus(petId)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
+    @GetMapping("/me")
+    fun getMyMemorials(
+        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
+        @RequestParam userId: Long
+    ): ResponseEntity<ApiResponse<PetPrivateMemorialListResponse>> {
+        val response = petService.getMyMemorials(userId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 }

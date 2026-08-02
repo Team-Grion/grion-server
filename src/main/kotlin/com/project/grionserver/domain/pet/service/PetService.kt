@@ -8,6 +8,7 @@ import com.project.grionserver.domain.image.repository.PetImageRepository
 import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
+import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.entity.Pet
 import com.project.grionserver.domain.pet.entity.Species
 import com.project.grionserver.domain.pet.repository.PetRepository
@@ -92,5 +93,15 @@ class PetService(
         val personalityText = request.personalities.joinToString(", ")
         return "품종이 ${request.breed}인 ${speciesText}이미지를 생성해줘. " +
             "성격은 ${personalityText}. 배경은 ${request.background}."
+    }
+
+    fun getPetStatus(petId: Long): PetStatusResponse {
+        val pet = petRepository.findById(petId)
+            .orElseThrow { NotFoundException("반려동물을 찾을 수 없습니다.") }
+
+        val task = aiImageTaskRepository.findFirstByPetOrderByIdDesc(pet)
+            ?: throw IllegalArgumentException("진행 중인 작업을 찾을 수 없습니다.")
+
+        return PetStatusResponse(status = task.status)
     }
 }

@@ -14,7 +14,7 @@ class SecurityConfig {
             .csrf { it.disable() }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/flux/**", "/memorials/**", "/error").permitAll()
+                    .requestMatchers("/memorials/**", "/error").permitAll()
                     .anyRequest().authenticated()
             }
             .httpBasic { }

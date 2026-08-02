@@ -3,6 +3,7 @@ package com.project.grionserver.domain.pet.controller
 import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
+import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.service.PetService
 import com.project.grionserver.global.response.ApiResponse
 import jakarta.validation.Valid
@@ -44,5 +45,14 @@ class PetController(private val petService: PetService) {
     ): ResponseEntity<ApiResponse<Unit?>> {
         petService.addPetInfo(petId, request)
         return ResponseEntity.ok(ApiResponse.success(null))
+    }
+
+    @GetMapping("/{petId}/status")
+    fun getPetStatus(
+        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
+        @PathVariable petId: Long
+    ): ResponseEntity<ApiResponse<PetStatusResponse>> {
+        val response = petService.getPetStatus(petId)
+        return ResponseEntity.ok(ApiResponse.success(response))
     }
 }

@@ -8,6 +8,8 @@ import com.project.grionserver.domain.image.repository.PetImageRepository
 import com.project.grionserver.domain.message.repository.MessageRepository
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
+import com.project.grionserver.domain.pet.dto.PetMemorialUpdateResponse
+import com.project.grionserver.domain.pet.dto.PetMemorialUpdateRequest
 import com.project.grionserver.domain.pet.dto.PetMemorialDetailResponse
 import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
 import com.project.grionserver.domain.pet.dto.PetMemorialPublicListResponse
@@ -78,6 +80,33 @@ class PetService(
         return PetCreateResponse(petId = pet.id, status = task.status)
     }
 
+    fun updateMemorial(petId: Long, request: PetMemorialUpdateRequest): PetMemorialUpdateResponse {
+        val pet = petRepository.findById(petId)
+            .orElseThrow { NotFoundException("반려동물을 찾을 수 없습니다.") }
+
+        request.content?.let { pet.memories = it }
+        request.isPublic?.let { pet.isShared = it }
+        petRepository.saveAndFlush(pet)
+
+        return toMemorialDetailResponse(pet)
+    }
+
+    private fun toMemorialDetailResponse(pet: Pet): PetMemorialUpdateResponse {
+        val task = aiImageTaskRepository.findFirstByPetOrderByIdDesc(pet)
+        val letterCount = messageRepository.countByPet(pet) // Todo: 추후 승인된 메시지만 카운트
+
+        return PetMemorialUpdateResponse(
+            petId = pet.id,
+            petName = pet.name,
+            aiImageUrl = task?.resultUrl,
+            birthDate = pet.birthday,
+            deathDate = pet.deathDate,
+            letterCount = letterCount,
+            content = pet.memories,
+            isPublic = pet.isShared,
+            updatedAt = pet.updatedAt
+        )
+    }
 
     fun getMemorialDetail(petId: Long): PetMemorialDetailResponse {
         val pet = petRepository.findById(petId)

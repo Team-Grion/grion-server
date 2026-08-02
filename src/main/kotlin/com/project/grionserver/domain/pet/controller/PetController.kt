@@ -4,6 +4,9 @@ import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
 import com.project.grionserver.domain.pet.dto.PetPrivateMemorialListResponse
+import com.project.grionserver.domain.pet.dto.PetMemorialUpdateResponse
+import com.project.grionserver.domain.pet.dto.PetMemorialUpdateRequest
+import com.project.grionserver.domain.pet.dto.PetMemorialDetailResponse
 import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.service.PetService
 import com.project.grionserver.global.response.ApiResponse
@@ -38,6 +41,16 @@ class PetController(private val petService: PetService) {
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
+    @PatchMapping("/me/{petId}")
+    fun updateMemorial(
+        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
+        @PathVariable petId: Long,
+        @RequestBody request: PetMemorialUpdateRequest
+    ): ResponseEntity<ApiResponse<PetMemorialUpdateResponse>> {
+        val response = petService.updateMemorial(petId, request)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
     @PostMapping("/{petId}/add")
     fun addPetInfo(
         @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
@@ -63,6 +76,15 @@ class PetController(private val petService: PetService) {
         @RequestParam userId: Long
     ): ResponseEntity<ApiResponse<PetPrivateMemorialListResponse>> {
         val response = petService.getMyMemorials(userId)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
+    @GetMapping("/me/{petId}")
+    fun getMemorialDetail(
+        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
+        @PathVariable petId: Long
+    ): ResponseEntity<ApiResponse<PetMemorialDetailResponse>> {
+        val response = petService.getMemorialDetail(petId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 }

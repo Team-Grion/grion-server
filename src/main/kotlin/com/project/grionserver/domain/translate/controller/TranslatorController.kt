@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 @Hidden
 @Tag(name = "Translation", description = "번역 API")
 @RestController
-@RequestMapping("/api/internal/translation")
+@RequestMapping("/internal/translation")
 class TranslationController(
     private val translatorService: TranslatorService,
 ) {

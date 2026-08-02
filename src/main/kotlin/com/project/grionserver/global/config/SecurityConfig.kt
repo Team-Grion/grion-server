@@ -16,6 +16,7 @@ class SecurityConfig {
                 auth
                     .requestMatchers("/flux/**", "/pet/**").permitAll()
                     .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                    .requestMatchers("/memorials/**", "/error").permitAll()
                     .anyRequest().authenticated()
             }
             .httpBasic { }

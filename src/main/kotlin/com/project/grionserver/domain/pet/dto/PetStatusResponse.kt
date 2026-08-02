@@ -1,6 +1,5 @@
 package com.project.grionserver.domain.pet.dto
 
-data class PetCreateResponse(
-    val petId: Long,
+data class PetStatusResponse(
     val status: String
 )

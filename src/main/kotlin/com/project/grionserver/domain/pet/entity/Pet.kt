@@ -18,31 +18,36 @@ class Pet(
     @JoinColumn(name = "user_id", nullable = false, foreignKey = ForeignKey(name = "FK_PET_USER"))
     val user: User,
 
-    @Column(name = "name", nullable = false, length = 50)
+    @Column(name = "name", length = 50)
     @Comment("반려동물 이름")
-    var name: String,
+    var name: String? = null,
 
     @Column(name = "birth_date")
     @Comment("반려동물 생일")
     var birthday: LocalDate? = null,
 
-    @Column(name = "death_date", nullable = false)
+    @Column(name = "death_date")
     @Comment("이별한 날짜")
     var deathDate: LocalDate? = null,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "species", nullable = false, length = 20)
-    @Comment("반려동물 종 (강아지, 고양이 등)")
-    var species: String,
+    @Comment("반려동물 종 (CAT, DOG)")
+    var species: Species,
 
     @Column(name = "breed", nullable = false, length = 50)
     @Comment("상세 품종")
     var breed: String,
 
-    @Column(name = "characteristics", nullable = false, length = 255)
-    @Comment("반려동물의 특징")
-    var characteristics: String? = null,
+    @ElementCollection
+    @CollectionTable(
+        name = "pet_personality",
+        joinColumns = [JoinColumn(name = "pet_id", foreignKey = ForeignKey(name = "FK_PET_PERSONALITY_PET"))]
+    )
+    @Column(name = "personality", nullable = false, length = 50)
+    var personalities: MutableList<String> = mutableListOf(),
 
-    @Column(name = "background_text", nullable = false, length = 255)
+    @Column(name = "background_text", length = 255)
     @Comment("추모 페이지 배경 설명")
     var backgroundText: String? = null,
 

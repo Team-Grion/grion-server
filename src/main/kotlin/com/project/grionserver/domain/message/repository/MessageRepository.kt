@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository
 interface MessageRepository : JpaRepository<Message, Long> {
     // 특정 반려동물 메시지 조회
     fun findAllByPet(pet: Pet): List<Message>
+
+    // 특정 반려동물에게 온 메시지 개수
+    fun countByPet(pet: Pet): Long
 }

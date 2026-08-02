@@ -97,7 +97,7 @@ class PetService(
 
     fun getPetStatus(petId: Long): PetStatusResponse {
         val pet = petRepository.findById(petId)
-            .orElseThrow { IllegalArgumentException("반려동물을 찾을 수 없습니다.") }
+            .orElseThrow { NotFoundException("반려동물을 찾을 수 없습니다.") }
 
         val task = aiImageTaskRepository.findFirstByPetOrderByIdDesc(pet)
             ?: throw IllegalArgumentException("진행 중인 작업을 찾을 수 없습니다.")

@@ -64,5 +64,6 @@ class PetController(private val petService: PetService) {
         @PathVariable petId: Long
     ): ResponseEntity<ApiResponse<PetMemorialDetailResponse>> {
         val response = petService.getMemorialDetail(petId)
+        return ResponseEntity.ok(ApiResponse.success(response))
     }
 }

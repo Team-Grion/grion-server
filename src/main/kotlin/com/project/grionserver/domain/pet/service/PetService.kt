@@ -77,7 +77,7 @@ class PetService(
 
     fun getMemorialDetail(petId: Long): PetMemorialDetailResponse {
         val pet = petRepository.findById(petId)
-            .orElseThrow { IllegalArgumentException("반려동물을 찾을 수 없습니다.") }
+            .orElseThrow { NotFoundException("반려동물을 찾을 수 없습니다.") }
 
         val task = aiImageTaskRepository.findFirstByPetOrderByIdDesc(pet)
         val letterCount = messageRepository.countByPet(pet) // Todo: 추후 승인된 메시지만 계산

@@ -14,6 +14,9 @@ import com.project.grionserver.domain.pet.dto.PetMemorialUpdateResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateRequest
 import com.project.grionserver.domain.pet.dto.PetMemorialDetailResponse
 import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
+import com.project.grionserver.domain.pet.dto.PetMemorialPublicListResponse
+import com.project.grionserver.domain.pet.dto.PetMemorialPublicSummary
+import com.project.grionserver.domain.pet.dto.PetMemorialPublicTodaySummary
 import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.entity.Pet
 import com.project.grionserver.domain.pet.entity.Species
@@ -25,6 +28,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDate
 import java.util.UUID
 
 @Service
@@ -157,6 +161,55 @@ class PetService(
             ?: throw IllegalArgumentException("진행 중인 작업을 찾을 수 없습니다.")
 
         return PetStatusResponse(status = task.status)
+    }
+
+    fun getPublicMemorials(species: String): PetMemorialPublicListResponse {
+        val pets = if (species.equals("ALL", ignoreCase = true)) {
+            petRepository.findAllByIsSharedTrue()
+        } else {
+            petRepository.findAllByIsSharedTrueAndSpecies(Species.fromString(species))
+        }
+
+        val startOfToday = LocalDate.now().atStartOfDay()
+        val startOfTomorrow = startOfToday.plusDays(1)
+
+        val latestImageTaskByPetId = if (pets.isEmpty()) {
+            emptyMap()
+        } else {
+            aiImageTaskRepository.findLatestByPetIn(pets).associateBy { it.pet.id }
+        }
+        val todayMessageCountByPetId = if (pets.isEmpty()) {
+            emptyMap()
+        } else {
+            messageRepository.countTodayMessagesGroupedByPet(pets, startOfToday, startOfTomorrow)
+                .associate { it.getPetId() to it.getCount() }
+        }
+        val totalMessageCountByPetId = if (pets.isEmpty()) {
+            emptyMap()
+        } else {
+            messageRepository.countMessagesGroupedByPet(pets).associate { it.getPetId() to it.getCount() }
+        }
+
+        val content = pets.map { pet ->
+            PetMemorialPublicSummary(
+                petId = pet.id,
+                petName = pet.name,
+                aiImageUrl = latestImageTaskByPetId[pet.id]?.resultUrl,
+                birthDate = pet.birthday,
+                deathDate = pet.deathDate,
+                introduction = pet.backgroundText,
+                personalities = pet.personalities,
+                todayMessageCount = todayMessageCountByPetId[pet.id] ?: 0L,
+                totalMessageCount = totalMessageCountByPetId[pet.id] ?: 0L
+            )
+        }
+
+        val todaySummary = PetMemorialPublicTodaySummary(
+            memorialCount = petRepository.countTodayPublicMemorials(startOfToday, startOfTomorrow),
+            messageCount = messageRepository.countTodayMessagesForPublicMemorials(startOfToday, startOfTomorrow)
+        )
+
+        return PetMemorialPublicListResponse(todaySummary = todaySummary, content = content)
     }
 
     fun getMyMemorials(userId: Long): PetPrivateMemorialListResponse {

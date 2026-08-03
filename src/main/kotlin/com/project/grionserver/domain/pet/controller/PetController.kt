@@ -7,6 +7,7 @@ import com.project.grionserver.domain.pet.dto.PetPrivateMemorialListResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateRequest
 import com.project.grionserver.domain.pet.dto.PetMemorialDetailResponse
+import com.project.grionserver.domain.pet.dto.PetMemorialPublicListResponse
 import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.service.PetService
 import com.project.grionserver.global.response.ApiResponse
@@ -85,6 +86,15 @@ class PetController(private val petService: PetService) {
         @PathVariable petId: Long
     ): ResponseEntity<ApiResponse<PetMemorialDetailResponse>> {
         val response = petService.getMemorialDetail(petId)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
+    @GetMapping("/public")
+    fun getPublicMemorials(
+        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
+        @RequestParam(defaultValue = "ALL") species: String
+    ): ResponseEntity<ApiResponse<PetMemorialPublicListResponse>> {
+        val response = petService.getPublicMemorials(species)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 }

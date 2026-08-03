@@ -5,11 +5,10 @@ import com.project.grionserver.domain.auth.dto.KakaoLoginResponse
 import com.project.grionserver.domain.user.entity.User
 import com.project.grionserver.domain.user.repository.UserRepository
 import com.project.grionserver.global.jwt.JwtProvider
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional
 class AuthService(
     private val kakaoAuthClient: KakaoAuthClient,
     private val userRepository: UserRepository,
@@ -21,13 +20,17 @@ class AuthService(
         val profile = kakaoUserInfo.kakaoAccount?.profile
 
         val user = userRepository.findByKakaoId(kakaoId)
-            ?: userRepository.save(
-                User(
-                    kakaoId = kakaoId,
-                    nickname = profile?.nickname ?: "사용자",
-                    profileImageUrl = profile?.profileImageUrl
+            ?: try {
+                userRepository.save(
+                    User(
+                        kakaoId = kakaoId,
+                        nickname = profile?.nickname ?: "사용자",
+                        profileImageUrl = profile?.profileImageUrl
+                    )
                 )
-            )
+            } catch (e: DataIntegrityViolationException) {
+                userRepository.findByKakaoId(kakaoId) ?: throw e
+            }
 
         return KakaoLoginResponse(
             accessToken = jwtProvider.createAccessToken(user.id),

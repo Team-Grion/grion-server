@@ -1,6 +1,5 @@
 package com.project.grionserver.domain.auth.client
 
-import com.project.grionserver.domain.auth.dto.kakao.KakaoUserInfoResponse
 import com.project.grionserver.global.exception.UnauthorizedException
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders

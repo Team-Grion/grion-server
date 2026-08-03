@@ -205,7 +205,7 @@ class PetService(
         }
 
         val todaySummary = PetMemorialPublicTodaySummary(
-            memorialCount = petRepository.countByIsSharedTrueAndCreatedAtBetween(startOfToday, startOfTomorrow),
+            memorialCount = petRepository.countTodayPublicMemorials(startOfToday, startOfTomorrow),
             messageCount = messageRepository.countTodayMessagesForPublicMemorials(startOfToday, startOfTomorrow)
         )
 

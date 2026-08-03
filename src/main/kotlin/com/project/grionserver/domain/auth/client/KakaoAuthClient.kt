@@ -4,13 +4,19 @@ import com.project.grionserver.global.exception.UnauthorizedException
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
 
 @Component
 class KakaoAuthClient {
-    private val restTemplate = RestTemplate()
+    private val restTemplate = RestTemplate(
+        SimpleClientHttpRequestFactory().apply {
+            setConnectTimeout(3000)
+            setReadTimeout(5000)
+        }
+    )
 
     fun getUserInfo(kakaoAccessToken: String): KakaoUserInfoResponse {
         val headers = HttpHeaders().apply {
@@ -25,7 +31,7 @@ class KakaoAuthClient {
                 KakaoUserInfoResponse::class.java
             ).body ?: throw UnauthorizedException("카카오 사용자 정보를 가져올 수 없습니다.")
         } catch (e: RestClientException) {
-            throw UnauthorizedException("유효하지 않은 카카오 액세스 토큰입니다.")
+            throw UnauthorizedException("유효하지 않은 카카오 액세스 토큰입니다.", e)
         }
     }
 }

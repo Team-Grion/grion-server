@@ -173,19 +173,34 @@ class PetService(
         val startOfToday = LocalDate.now().atStartOfDay()
         val startOfTomorrow = startOfToday.plusDays(1)
 
-        val content = pets.map { pet ->
-            val task = aiImageTaskRepository.findFirstByPetOrderByIdDesc(pet)
+        val latestImageTaskByPetId = if (pets.isEmpty()) {
+            emptyMap()
+        } else {
+            aiImageTaskRepository.findLatestByPetIn(pets).associateBy { it.pet.id }
+        }
+        val todayMessageCountByPetId = if (pets.isEmpty()) {
+            emptyMap()
+        } else {
+            messageRepository.countTodayMessagesGroupedByPet(pets, startOfToday, startOfTomorrow)
+                .associate { it.getPetId() to it.getCount() }
+        }
+        val totalMessageCountByPetId = if (pets.isEmpty()) {
+            emptyMap()
+        } else {
+            messageRepository.countMessagesGroupedByPet(pets).associate { it.getPetId() to it.getCount() }
+        }
 
+        val content = pets.map { pet ->
             PetMemorialPublicSummary(
                 petId = pet.id,
                 petName = pet.name,
-                aiImageUrl = task?.resultUrl,
+                aiImageUrl = latestImageTaskByPetId[pet.id]?.resultUrl,
                 birthDate = pet.birthday,
                 deathDate = pet.deathDate,
                 introduction = pet.backgroundText,
                 personalities = pet.personalities,
-                todayMessageCount = messageRepository.countByPetAndCreatedAtBetween(pet, startOfToday, startOfTomorrow),
-                totalMessageCount = messageRepository.countByPet(pet)
+                todayMessageCount = todayMessageCountByPetId[pet.id] ?: 0L,
+                totalMessageCount = totalMessageCountByPetId[pet.id] ?: 0L
             )
         }
 

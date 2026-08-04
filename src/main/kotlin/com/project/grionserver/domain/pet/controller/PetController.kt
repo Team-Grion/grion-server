@@ -14,6 +14,7 @@ import com.project.grionserver.global.response.ApiResponse
 import jakarta.validation.Valid
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
@@ -23,8 +24,7 @@ class PetController(private val petService: PetService) {
 
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createPet(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
-        @RequestParam userId: Long,
+        @AuthenticationPrincipal userId: Long,
         @RequestPart("petImageUrl") petImage: MultipartFile,
         @RequestParam species: String,
         @RequestParam breed: String,
@@ -44,7 +44,6 @@ class PetController(private val petService: PetService) {
 
     @PatchMapping("/me/{petId}")
     fun updateMemorial(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
         @PathVariable petId: Long,
         @RequestBody request: PetMemorialUpdateRequest
     ): ResponseEntity<ApiResponse<PetMemorialUpdateResponse>> {
@@ -54,7 +53,6 @@ class PetController(private val petService: PetService) {
 
     @PostMapping("/{petId}/add")
     fun addPetInfo(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
         @PathVariable petId: Long,
         @Valid @RequestBody request: PetAdditionalInfoRequest
     ): ResponseEntity<ApiResponse<Unit?>> {
@@ -64,7 +62,6 @@ class PetController(private val petService: PetService) {
 
     @GetMapping("/{petId}/status")
     fun getPetStatus(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
         @PathVariable petId: Long
     ): ResponseEntity<ApiResponse<PetStatusResponse>> {
         val response = petService.getPetStatus(petId)
@@ -73,8 +70,7 @@ class PetController(private val petService: PetService) {
 
     @GetMapping("/me")
     fun getMyMemorials(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
-        @RequestParam userId: Long
+        @AuthenticationPrincipal userId: Long
     ): ResponseEntity<ApiResponse<PetPrivateMemorialListResponse>> {
         val response = petService.getMyMemorials(userId)
         return ResponseEntity.ok(ApiResponse.success(response))
@@ -82,7 +78,6 @@ class PetController(private val petService: PetService) {
 
     @GetMapping("/me/{petId}")
     fun getMemorialDetail(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
         @PathVariable petId: Long
     ): ResponseEntity<ApiResponse<PetMemorialDetailResponse>> {
         val response = petService.getMemorialDetail(petId)
@@ -91,7 +86,6 @@ class PetController(private val petService: PetService) {
 
     @GetMapping("/public")
     fun getPublicMemorials(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
         @RequestParam(defaultValue = "ALL") species: String
     ): ResponseEntity<ApiResponse<PetMemorialPublicListResponse>> {
         val response = petService.getPublicMemorials(species)

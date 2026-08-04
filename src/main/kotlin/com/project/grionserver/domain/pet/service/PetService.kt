@@ -5,11 +5,14 @@ import com.project.grionserver.domain.image.entity.PetImage
 import com.project.grionserver.domain.image.event.AiImageGenerationRequestedEvent
 import com.project.grionserver.domain.image.repository.AiImageTaskRepository
 import com.project.grionserver.domain.image.repository.PetImageRepository
+import com.project.grionserver.domain.message.entity.Message
 import com.project.grionserver.domain.message.repository.MessageRepository
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
 import com.project.grionserver.domain.pet.dto.PetLetterListResponse
 import com.project.grionserver.domain.pet.dto.PetLetterSummary
+import com.project.grionserver.domain.pet.dto.PetLetterCreateRequest
+import com.project.grionserver.domain.pet.dto.PetLetterCreateResponse
 import com.project.grionserver.domain.pet.dto.PetPrivateMemorialListResponse
 import com.project.grionserver.domain.pet.dto.PetPrivateMemorialSummary
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateResponse
@@ -246,6 +249,26 @@ class PetService(
         }
 
         return PetLetterListResponse(petId = pet.id, letters = letters)
+    }
+
+    fun createLetter(petId: Long, userId: Long, request: PetLetterCreateRequest): PetLetterCreateResponse {
+        val pet = petRepository.findByIdAndIsSharedTrue(petId)
+            ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
+
+        val sender = userRepository.findById(userId)
+            .orElseThrow { NotFoundException("사용자를 찾을 수 없습니다.") }
+
+        val message = messageRepository.save(
+            Message(
+                pet = pet,
+                sender = sender,
+                content = request.content,
+                isAnonymous = request.isAnonymous,
+                status = "APPROVED"
+            )
+        )
+
+        return PetLetterCreateResponse(letterId = message.id, createdAt = message.createdAt)
     }
 
     fun getMyMemorials(userId: Long): PetPrivateMemorialListResponse {

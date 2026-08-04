@@ -28,11 +28,17 @@ class JwtAuthenticationFilter(
                 SecurityContextHolder.getContext().authentication = authentication
             } catch (e: JwtException) {
                 SecurityContextHolder.clearContext()
+                request.setAttribute(AUTH_ERROR_ATTRIBUTE, "유효하지 않은 엑세스 토큰입니다.")
             } catch (e: IllegalArgumentException) {
                 SecurityContextHolder.clearContext()
+                request.setAttribute(AUTH_ERROR_ATTRIBUTE, "유효하지 않은 엑세스 토큰입니다.")
             }
         }
 
         filterChain.doFilter(request, response)
+    }
+
+    companion object {
+        const val AUTH_ERROR_ATTRIBUTE = "authError"
     }
 }

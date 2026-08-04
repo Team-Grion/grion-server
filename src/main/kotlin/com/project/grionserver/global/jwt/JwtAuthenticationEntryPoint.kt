@@ -20,12 +20,15 @@ class JwtAuthenticationEntryPoint(
         response: HttpServletResponse,
         authException: AuthenticationException
     ) {
+        val message = request.getAttribute(JwtAuthenticationFilter.AUTH_ERROR_ATTRIBUTE) as? String
+            ?: "인증이 필요합니다."
+
         response.status = HttpStatus.UNAUTHORIZED.value()
         response.contentType = MediaType.APPLICATION_JSON_VALUE
         response.characterEncoding = "UTF-8"
         response.writer.write(
             objectMapper.writeValueAsString(
-                ApiResponse.fail("유효하지 않은 엑세스 토큰입니다.", HttpStatus.UNAUTHORIZED.value())
+                ApiResponse.fail(message, HttpStatus.UNAUTHORIZED.value())
             )
         )
     }

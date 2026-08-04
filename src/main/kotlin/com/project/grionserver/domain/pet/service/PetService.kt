@@ -8,6 +8,8 @@ import com.project.grionserver.domain.image.repository.PetImageRepository
 import com.project.grionserver.domain.message.repository.MessageRepository
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
+import com.project.grionserver.domain.pet.dto.PetLetterListResponse
+import com.project.grionserver.domain.pet.dto.PetLetterSummary
 import com.project.grionserver.domain.pet.dto.PetPrivateMemorialListResponse
 import com.project.grionserver.domain.pet.dto.PetPrivateMemorialSummary
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateResponse
@@ -228,6 +230,22 @@ class PetService(
             deathDate = pet.deathDate,
             personalities = pet.personalities.toList()
         )
+    }
+
+    fun getLetters(petId: Long): PetLetterListResponse {
+        val pet = petRepository.findById(petId)
+            .orElseThrow { NotFoundException("반려동물을 찾을 수 없습니다.") }
+
+        val letters = messageRepository.findAllByPetOrderByCreatedAtDesc(pet).map { message ->
+            PetLetterSummary(
+                letterId = message.id,
+                senderName = if (message.isAnonymous) "익명" else message.sender.nickname,
+                content = message.content,
+                createdAt = message.createdAt
+            )
+        }
+
+        return PetLetterListResponse(petId = pet.id, letters = letters)
     }
 
     fun getMyMemorials(userId: Long): PetPrivateMemorialListResponse {

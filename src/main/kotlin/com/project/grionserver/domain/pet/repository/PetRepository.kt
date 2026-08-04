@@ -19,6 +19,9 @@ interface PetRepository : JpaRepository<Pet, Long> {
     // 공개된 추모 페이지 목록 조회
     fun findAllByIsSharedTrueAndSpecies(species: Species): List<Pet>
 
+    // 공개된 추모 페이지 단건 조회
+    fun findByIdAndIsSharedTrue(id: Long): Pet?
+
     // 오늘 새로 등록된 공개 추모 공간 개수
     @Query("SELECT COUNT(p) FROM Pet p WHERE p.isShared = true AND p.createdAt >= :start AND p.createdAt < :end")
     fun countTodayPublicMemorials(start: LocalDateTime, end: LocalDateTime): Long

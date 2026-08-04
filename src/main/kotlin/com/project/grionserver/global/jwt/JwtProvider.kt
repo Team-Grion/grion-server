@@ -19,6 +19,12 @@ class JwtProvider(
 
     fun createRefreshToken(userId: Long): String = createToken(userId, refreshTokenExpiration, "refresh")
 
+    fun getUserIdFromAccessToken(token: String): Long {
+        val claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).payload
+        require(claims["type"] == "access") { "엑세스 토큰이 아닙니다." }
+        return claims.subject.toLong()
+    }
+
     private fun createToken(userId: Long, expiration: Long, type: String): String {
         val now = Date()
         return Jwts.builder()

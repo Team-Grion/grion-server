@@ -107,7 +107,7 @@ class PetController(private val petService: PetService) {
     fun createLetter(
         @AuthenticationPrincipal userId: Long,
         @PathVariable petId: Long,
-        @RequestBody request: PetLetterCreateRequest
+        @Valid @RequestBody request: PetLetterCreateRequest
     ): ResponseEntity<ApiResponse<PetLetterCreateResponse>> {
         val response = petService.createLetter(petId, userId, request)
         return ResponseEntity.ok(ApiResponse.success(response))

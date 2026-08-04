@@ -3,6 +3,7 @@ package com.project.grionserver.domain.pet.controller
 import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
+import com.project.grionserver.domain.pet.dto.PetLetterListResponse
 import com.project.grionserver.domain.pet.dto.PetPrivateMemorialListResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateRequest
@@ -82,6 +83,14 @@ class PetController(private val petService: PetService) {
         @PathVariable petId: Long
     ): ResponseEntity<ApiResponse<PetMemorialDetailResponse>> {
         val response = petService.getMemorialDetail(petId)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
+    @GetMapping("/me/{petId}/letters")
+    fun getLetters(
+        @PathVariable petId: Long
+    ): ResponseEntity<ApiResponse<PetLetterListResponse>> {
+        val response = petService.getLetters(petId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 

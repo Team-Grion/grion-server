@@ -199,7 +199,7 @@ class PetService(
                 birthDate = pet.birthday,
                 deathDate = pet.deathDate,
                 introduction = pet.backgroundText,
-                personalities = pet.personalities,
+                personalities = pet.personalities.toList(),
                 todayMessageCount = todayMessageCountByPetId[pet.id] ?: 0L,
                 totalMessageCount = totalMessageCountByPetId[pet.id] ?: 0L
             )
@@ -226,7 +226,7 @@ class PetService(
             aiImageUrl = task?.resultUrl,
             birthDate = pet.birthday,
             deathDate = pet.deathDate,
-            personalities = pet.personalities
+            personalities = pet.personalities.toList()
         )
     }
 

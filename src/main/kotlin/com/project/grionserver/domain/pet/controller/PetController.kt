@@ -7,6 +7,7 @@ import com.project.grionserver.domain.pet.dto.PetPrivateMemorialListResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateRequest
 import com.project.grionserver.domain.pet.dto.PetMemorialDetailResponse
+import com.project.grionserver.domain.pet.dto.PetMemorialPublicDetailResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialPublicListResponse
 import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.service.PetService
@@ -89,6 +90,14 @@ class PetController(private val petService: PetService) {
         @RequestParam(defaultValue = "ALL") species: String
     ): ResponseEntity<ApiResponse<PetMemorialPublicListResponse>> {
         val response = petService.getPublicMemorials(species)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
+    @GetMapping("/public/{petId}")
+    fun getPublicMemorialDetail(
+        @PathVariable petId: Long
+    ): ResponseEntity<ApiResponse<PetMemorialPublicDetailResponse>> {
+        val response = petService.getPublicMemorialDetail(petId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 }

@@ -1,11 +1,13 @@
 package com.project.grionserver.domain.auth.client
 
+import com.project.grionserver.global.exception.BadGatewayException
 import com.project.grionserver.global.exception.UnauthorizedException
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
 
@@ -31,7 +33,13 @@ class KakaoAuthClient {
                 KakaoUserInfoResponse::class.java
             ).body ?: throw UnauthorizedException("카카오 사용자 정보를 가져올 수 없습니다.")
         } catch (e: RestClientException) {
-            throw UnauthorizedException("유효하지 않은 카카오 액세스 토큰입니다.", e)
+            throw when (e) {
+                is HttpClientErrorException.Unauthorized,
+                is HttpClientErrorException.Forbidden ->
+                    UnauthorizedException("유효하지 않은 카카오 액세스 토큰입니다.", e)
+                else ->
+                    BadGatewayException("카카오 서버와 통신할 수 없습니다.", e)
+            }
         }
     }
 }

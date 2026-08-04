@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(private val userService: UserService) {
 
     @GetMapping("/me")
-    fun getMe(
+    fun getMyPage(
         @AuthenticationPrincipal userId: Long
     ): ResponseEntity<ApiResponse<UserPageResponse>> {
-        val response = userService.getMe(userId)
+        val response = userService.getMyPage(userId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 }

@@ -14,7 +14,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val messageRepository: MessageRepository
 ) {
-    fun getMe(userId: Long): UserPageResponse {
+    fun getMyPage(userId: Long): UserPageResponse {
         val user = userRepository.findById(userId)
             .orElseThrow { NotFoundException("사용자를 찾을 수 없습니다.") }
 

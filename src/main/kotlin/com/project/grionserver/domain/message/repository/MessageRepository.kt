@@ -9,10 +9,8 @@ import java.time.LocalDateTime
 
 @Repository
 interface MessageRepository : JpaRepository<Message, Long> {
-    // 특정 반려동물 메시지 조회
-    fun findAllByPet(pet: Pet): List<Message>
 
-    // 특정 반려동물에게 온 메시지를 최신순으로 조회
+    // 특정 반려동물 메시지를 최신순으로 조회
     fun findAllByPetOrderByCreatedAtDesc(pet: Pet): List<Message>
 
     // 특정 반려동물에게 온 메시지 개수

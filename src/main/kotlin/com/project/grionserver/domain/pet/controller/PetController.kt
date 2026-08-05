@@ -3,9 +3,15 @@ package com.project.grionserver.domain.pet.controller
 import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
+import com.project.grionserver.domain.pet.dto.PetLetterListResponse
+import com.project.grionserver.domain.pet.dto.PetLetterCreateRequest
+import com.project.grionserver.domain.pet.dto.PetLetterCreateResponse
+import com.project.grionserver.domain.pet.dto.PetPrivateMemorialListResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateRequest
 import com.project.grionserver.domain.pet.dto.PetMemorialDetailResponse
+import com.project.grionserver.domain.pet.dto.PetMemorialPublicDetailResponse
+import com.project.grionserver.domain.pet.dto.PetMemorialPublicListResponse
 import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.service.PetService
 import com.project.grionserver.global.response.ApiResponse
@@ -14,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
@@ -26,8 +33,7 @@ class PetController(private val petService: PetService) {
             "종: 강아지는 DOG, 고양이는 CAT")
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createPet(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
-        @RequestParam userId: Long,
+        @AuthenticationPrincipal userId: Long,
         @RequestPart("petImageUrl") petImage: MultipartFile,
         @RequestParam species: String,
         @RequestParam breed: String,
@@ -48,11 +54,11 @@ class PetController(private val petService: PetService) {
     @Operation(summary = "추모 공간 수정", description = "추모 공간의 내용과 공개 여부를 수정합니다.")
     @PatchMapping("/me/{petId}")
     fun updateMemorial(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
+        @AuthenticationPrincipal userId: Long,
         @PathVariable petId: Long,
         @RequestBody request: PetMemorialUpdateRequest
     ): ResponseEntity<ApiResponse<PetMemorialUpdateResponse>> {
-        val response = petService.updateMemorial(petId, request)
+        val response = petService.updateMemorial(petId, userId, request)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
@@ -60,11 +66,11 @@ class PetController(private val petService: PetService) {
             "반려 동물 이름은 공백이 불가하며 기일은 생일보다 빠를 수 없습니다.")
     @PostMapping("/{petId}/add")
     fun addPetInfo(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
+        @AuthenticationPrincipal userId: Long,
         @PathVariable petId: Long,
         @Valid @RequestBody request: PetAdditionalInfoRequest
     ): ResponseEntity<ApiResponse<Unit?>> {
-        petService.addPetInfo(petId, request)
+        petService.addPetInfo(petId, userId, request)
         return ResponseEntity.ok(ApiResponse.success(null))
     }
 
@@ -72,21 +78,63 @@ class PetController(private val petService: PetService) {
             "생성 중: PENDING, 생성 성공: SUCCESS, 생성 실패: FAIL")
     @GetMapping("/{petId}/status")
     fun getPetStatus(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
+        @AuthenticationPrincipal userId: Long,
         @PathVariable petId: Long
     ): ResponseEntity<ApiResponse<PetStatusResponse>> {
-        val response = petService.getPetStatus(petId)
+        val response = petService.getPetStatus(petId, userId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
+    @GetMapping("/me")
+    fun getMyMemorials(
+        @AuthenticationPrincipal userId: Long
+    ): ResponseEntity<ApiResponse<PetPrivateMemorialListResponse>> {
+        val response = petService.getMyMemorials(userId)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
 
     @Operation(summary = "개인 추모 공간 상세 조회", description = "petId에 해당하는 추모 공간의 상세 정보를 조회합니다.")
     @GetMapping("/me/{petId}")
     fun getMemorialDetail(
-        @RequestHeader("Authorization") authorization: String, // Todo: 인증 로직 추후 구현
+        @AuthenticationPrincipal userId: Long,
         @PathVariable petId: Long
     ): ResponseEntity<ApiResponse<PetMemorialDetailResponse>> {
-        val response = petService.getMemorialDetail(petId)
+        val response = petService.getMemorialDetail(petId, userId)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
+    @GetMapping("/me/{petId}/letters")
+    fun getLetters(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable petId: Long
+    ): ResponseEntity<ApiResponse<PetLetterListResponse>> {
+        val response = petService.getLetters(petId, userId)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
+    @GetMapping("/public")
+    fun getPublicMemorials(
+        @RequestParam(defaultValue = "ALL") species: String
+    ): ResponseEntity<ApiResponse<PetMemorialPublicListResponse>> {
+        val response = petService.getPublicMemorials(species)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
+    @GetMapping("/public/{petId}")
+    fun getPublicMemorialDetail(
+        @PathVariable petId: Long
+    ): ResponseEntity<ApiResponse<PetMemorialPublicDetailResponse>> {
+        val response = petService.getPublicMemorialDetail(petId)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
+    @PostMapping("/public/{petId}/letter")
+    fun createLetter(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable petId: Long,
+        @Valid @RequestBody request: PetLetterCreateRequest
+    ): ResponseEntity<ApiResponse<PetLetterCreateResponse>> {
+        val response = petService.createLetter(petId, userId, request)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 }

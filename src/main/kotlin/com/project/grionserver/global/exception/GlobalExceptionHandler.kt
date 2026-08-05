@@ -28,6 +28,20 @@ class GlobalExceptionHandler {
             .body(ApiResponse.fail(e.message ?: "리소스를 찾을 수 없습니다.", statusCode))
     }
 
+    @ExceptionHandler(UnauthorizedException::class)
+    fun handleUnauthorizedException(e: UnauthorizedException): ResponseEntity<ApiResponse<Unit?>> {
+        val statusCode = HttpStatus.UNAUTHORIZED.value()
+        return ResponseEntity.status(statusCode)
+            .body(ApiResponse.fail(e.message ?: "인증에 실패했습니다.", statusCode))
+    }
+
+    @ExceptionHandler(BadGatewayException::class)
+    fun handleBadGatewayException(e: BadGatewayException): ResponseEntity<ApiResponse<Unit?>> {
+        val statusCode = HttpStatus.BAD_GATEWAY.value()
+        return ResponseEntity.status(statusCode)
+            .body(ApiResponse.fail(e.message ?: "외부 서비스와 통신할 수 없습니다.", statusCode))
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ApiResponse<Unit?>> {
         val message = e.bindingResult.fieldErrors

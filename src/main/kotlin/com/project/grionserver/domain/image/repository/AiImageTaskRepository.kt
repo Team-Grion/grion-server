@@ -11,9 +11,6 @@ interface AiImageTaskRepository : JpaRepository<AiImageTask, Long> {
     // 특정 반려동물의 AI 작업 상태 확인
     fun findFirstByPetOrderByIdDesc(pet: Pet): AiImageTask?
 
-    // 아직 처리되지 않은 작업들 조회
-    fun findAllByStatus(status: String): List<AiImageTask>
-
     // 여러 반려동물의 가장 최근 AI 작업을 한 번에 조회
     @Query(
         """

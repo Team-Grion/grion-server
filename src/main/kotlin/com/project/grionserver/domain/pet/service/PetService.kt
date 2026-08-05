@@ -5,9 +5,14 @@ import com.project.grionserver.domain.image.entity.PetImage
 import com.project.grionserver.domain.image.event.AiImageGenerationRequestedEvent
 import com.project.grionserver.domain.image.repository.AiImageTaskRepository
 import com.project.grionserver.domain.image.repository.PetImageRepository
+import com.project.grionserver.domain.message.entity.Message
 import com.project.grionserver.domain.message.repository.MessageRepository
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
+import com.project.grionserver.domain.pet.dto.PetLetterListResponse
+import com.project.grionserver.domain.pet.dto.PetLetterSummary
+import com.project.grionserver.domain.pet.dto.PetLetterCreateRequest
+import com.project.grionserver.domain.pet.dto.PetLetterCreateResponse
 import com.project.grionserver.domain.pet.dto.PetPrivateMemorialListResponse
 import com.project.grionserver.domain.pet.dto.PetPrivateMemorialSummary
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateResponse
@@ -83,9 +88,9 @@ class PetService(
         return PetCreateResponse(petId = pet.id, status = task.status)
     }
 
-    fun updateMemorial(petId: Long, request: PetMemorialUpdateRequest): PetMemorialUpdateResponse {
-        val pet = petRepository.findById(petId)
-            .orElseThrow { NotFoundException("반려동물을 찾을 수 없습니다.") }
+    fun updateMemorial(petId: Long, userId: Long, request: PetMemorialUpdateRequest): PetMemorialUpdateResponse {
+        val pet = petRepository.findByIdAndUserId(petId, userId)
+            ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 
         request.content?.let { pet.memories = it }
         request.isPublic?.let { pet.isShared = it }
@@ -111,9 +116,9 @@ class PetService(
         )
     }
 
-    fun getMemorialDetail(petId: Long): PetMemorialDetailResponse {
-        val pet = petRepository.findById(petId)
-            .orElseThrow { NotFoundException("반려동물을 찾을 수 없습니다.") }
+    fun getMemorialDetail(petId: Long, userId: Long): PetMemorialDetailResponse {
+        val pet = petRepository.findByIdAndUserId(petId, userId)
+            ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 
         val task = aiImageTaskRepository.findFirstByPetOrderByIdDesc(pet)
         val letterCount = messageRepository.countByPet(pet) // Todo: 추후 승인된 메시지만 계산
@@ -130,13 +135,13 @@ class PetService(
         )
     }
 
-    fun addPetInfo(petId: Long, request: PetAdditionalInfoRequest) {
+    fun addPetInfo(petId: Long, userId: Long, request: PetAdditionalInfoRequest) {
         require(!request.deathDate.isBefore(request.birthDate)) {
             "기일은 생일보다 빠를 수 없습니다."
         }
 
-        val pet = petRepository.findById(petId)
-            .orElseThrow { NotFoundException("반려동물을 찾을 수 없습니다.") }
+        val pet = petRepository.findByIdAndUserId(petId, userId)
+            ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 
         pet.name = request.petName
         pet.birthday = request.birthDate
@@ -154,9 +159,9 @@ class PetService(
                 "성격은 ${personalityText}. 배경은 ${request.background}."
     }
 
-    fun getPetStatus(petId: Long): PetStatusResponse {
-        val pet = petRepository.findById(petId)
-            .orElseThrow { NotFoundException("반려동물을 찾을 수 없습니다.") }
+    fun getPetStatus(petId: Long, userId: Long): PetStatusResponse {
+        val pet = petRepository.findByIdAndUserId(petId, userId)
+            ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 
         val task = aiImageTaskRepository.findFirstByPetOrderByIdDesc(pet)
             ?: throw IllegalArgumentException("진행 중인 작업을 찾을 수 없습니다.")
@@ -228,6 +233,42 @@ class PetService(
             deathDate = pet.deathDate,
             personalities = pet.personalities.toList()
         )
+    }
+
+    fun getLetters(petId: Long, userId: Long): PetLetterListResponse {
+        val pet = petRepository.findByIdAndUserId(petId, userId)
+            ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
+
+        val letters = messageRepository.findAllByPetOrderByCreatedAtDesc(pet).map { message ->
+            PetLetterSummary(
+                letterId = message.id,
+                senderName = if (message.isAnonymous) "익명" else message.sender.nickname,
+                content = message.content,
+                createdAt = message.createdAt
+            )
+        }
+
+        return PetLetterListResponse(petId = pet.id, letters = letters)
+    }
+
+    fun createLetter(petId: Long, userId: Long, request: PetLetterCreateRequest): PetLetterCreateResponse {
+        val pet = petRepository.findByIdAndIsSharedTrue(petId)
+            ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
+
+        val sender = userRepository.findById(userId)
+            .orElseThrow { NotFoundException("사용자를 찾을 수 없습니다.") }
+
+        val message = messageRepository.save(
+            Message(
+                pet = pet,
+                sender = sender,
+                content = request.content,
+                isAnonymous = request.isAnonymous,
+                status = "APPROVED"
+            )
+        )
+
+        return PetLetterCreateResponse(letterId = message.id, createdAt = message.createdAt)
     }
 
     fun getMyMemorials(userId: Long): PetPrivateMemorialListResponse {

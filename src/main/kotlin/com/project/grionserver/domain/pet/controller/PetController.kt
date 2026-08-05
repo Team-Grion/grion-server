@@ -85,6 +85,7 @@ class PetController(private val petService: PetService) {
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
+    @Operation(summary = "개인 추모 공간 목록 조회", description = "개인 추모 공간 목록을 조회합니다.")
     @GetMapping("/me")
     fun getMyMemorials(
         @AuthenticationPrincipal userId: Long
@@ -93,7 +94,7 @@ class PetController(private val petService: PetService) {
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
-    @Operation(summary = "개인 추모 공간 상세 조회", description = "petId에 해당하는 추모 공간의 상세 정보를 조회합니다.")
+    @Operation(summary = "개인 추모 공간 상세 조회", description = "petId에 해당하는 개인 추모 공간의 상세 정보를 조회합니다.")
     @GetMapping("/me/{petId}")
     fun getMemorialDetail(
         @AuthenticationPrincipal userId: Long,
@@ -103,6 +104,7 @@ class PetController(private val petService: PetService) {
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
+    @Operation(summary = "쪽지 목록 조회", description = "petId에 해당하는 추모 공간에 도착한 쪽지 목록을 조회합니다.")
     @GetMapping("/me/{petId}/letters")
     fun getLetters(
         @AuthenticationPrincipal userId: Long,
@@ -112,6 +114,8 @@ class PetController(private val petService: PetService) {
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
+    @Operation(summary = "공개 추모 공간 목록 조회", description = "공개된 추모 공간 목록을 조회합니다. species: 전체 - `ALL` (생략시 ALL로 들어감), " +
+            "강아지: `DOG`, 고양이: `CAT`")
     @GetMapping("/public")
     fun getPublicMemorials(
         @RequestParam(defaultValue = "ALL") species: String
@@ -120,6 +124,7 @@ class PetController(private val petService: PetService) {
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
+    @Operation(summary = "공개 추모 공간 상세 조회", description = "petId에 해당하는 공개 추모 공간의 상세 정보를 조회합니다.")
     @GetMapping("/public/{petId}")
     fun getPublicMemorialDetail(
         @PathVariable petId: Long
@@ -128,6 +133,7 @@ class PetController(private val petService: PetService) {
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
+    @Operation(summary = "쪽지 작성", description = "공개된 추모 공간에 쪽지를 작성합니다.")
     @PostMapping("/public/{petId}/letter")
     fun createLetter(
         @AuthenticationPrincipal userId: Long,

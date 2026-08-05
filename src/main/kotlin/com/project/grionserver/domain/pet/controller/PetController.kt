@@ -48,27 +48,30 @@ class PetController(private val petService: PetService) {
 
     @PatchMapping("/me/{petId}")
     fun updateMemorial(
+        @AuthenticationPrincipal userId: Long,
         @PathVariable petId: Long,
         @RequestBody request: PetMemorialUpdateRequest
     ): ResponseEntity<ApiResponse<PetMemorialUpdateResponse>> {
-        val response = petService.updateMemorial(petId, request)
+        val response = petService.updateMemorial(petId, userId, request)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
     @PostMapping("/{petId}/add")
     fun addPetInfo(
+        @AuthenticationPrincipal userId: Long,
         @PathVariable petId: Long,
         @Valid @RequestBody request: PetAdditionalInfoRequest
     ): ResponseEntity<ApiResponse<Unit?>> {
-        petService.addPetInfo(petId, request)
+        petService.addPetInfo(petId, userId, request)
         return ResponseEntity.ok(ApiResponse.success(null))
     }
 
     @GetMapping("/{petId}/status")
     fun getPetStatus(
+        @AuthenticationPrincipal userId: Long,
         @PathVariable petId: Long
     ): ResponseEntity<ApiResponse<PetStatusResponse>> {
-        val response = petService.getPetStatus(petId)
+        val response = petService.getPetStatus(petId, userId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
@@ -82,17 +85,19 @@ class PetController(private val petService: PetService) {
 
     @GetMapping("/me/{petId}")
     fun getMemorialDetail(
+        @AuthenticationPrincipal userId: Long,
         @PathVariable petId: Long
     ): ResponseEntity<ApiResponse<PetMemorialDetailResponse>> {
-        val response = petService.getMemorialDetail(petId)
+        val response = petService.getMemorialDetail(petId, userId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
     @GetMapping("/me/{petId}/letters")
     fun getLetters(
+        @AuthenticationPrincipal userId: Long,
         @PathVariable petId: Long
     ): ResponseEntity<ApiResponse<PetLetterListResponse>> {
-        val response = petService.getLetters(petId)
+        val response = petService.getLetters(petId, userId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 

@@ -2,12 +2,14 @@ package com.project.grionserver.domain.translate.controller
 
 import com.project.grionserver.domain.translate.dto.internal.TranslationRequest
 import com.project.grionserver.domain.translate.service.TranslatorService
+import io.swagger.v3.oas.annotations.Hidden
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 
+@Hidden
 @RestController
 @RequestMapping("/internal/translation")
 class TranslationController(

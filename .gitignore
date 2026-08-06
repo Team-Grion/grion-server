@@ -40,5 +40,5 @@ out/
 .kotlin
 
 ### Secrets ###
-src/main/resources/application.yaml
+src/main/resources/application-local.yaml
 http-client.private.env.json

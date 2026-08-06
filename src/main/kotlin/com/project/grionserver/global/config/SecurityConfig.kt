@@ -2,7 +2,7 @@ package com.project.grionserver.global.config
 
 import com.project.grionserver.global.jwt.JwtAuthenticationEntryPoint
 import com.project.grionserver.global.jwt.JwtAuthenticationFilter
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -14,10 +14,11 @@ import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
+@EnableConfigurationProperties(CorsProperties::class)
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
-    @Value("\${cors.allowed-origins}") private val allowedOrigins: List<String>
+    private val corsProperties: CorsProperties
 ) {
 
     @Bean
@@ -39,7 +40,7 @@ class SecurityConfig(
 
     private fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration().apply {
-            allowedOrigins = this@SecurityConfig.allowedOrigins
+            allowedOrigins = corsProperties.allowedOrigins
             allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             allowedHeaders = listOf("*")
             allowCredentials = true

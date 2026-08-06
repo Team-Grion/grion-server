@@ -72,7 +72,7 @@ CREATE TABLE `pet_image` (
 CREATE TABLE `pet_personality` (
   `pet_id` bigint NOT NULL,
   `personality` varchar(50) NOT NULL,
-  KEY `FK_PET_PERSONALITY_PET` (`pet_id`),
+  PRIMARY KEY (`pet_id`, `personality`),
   CONSTRAINT `FK_PET_PERSONALITY_PET` FOREIGN KEY (`pet_id`) REFERENCES `pet` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

@@ -1,0 +1,16 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://${DB_HOST}:3306/grion_db?serverTimezone=Asia/Seoul
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      DEEPL_API_KEY: ${DEEPL_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      FAL_API_KEY: ${FAL_API_KEY}
+      FRONTEND_PROD_ORIGIN: ${FRONTEND_PROD_ORIGIN}
+    restart: unless-stopped

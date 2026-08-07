@@ -19,3 +19,4 @@ jwt:
 cors:
   allowed-origins:
     - ${FRONTEND_PROD_ORIGIN}
+    - http://localhost:3000

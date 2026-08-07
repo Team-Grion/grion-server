@@ -1,6 +1,6 @@
 services:
   app:
-    image: vahkjsdf/grion-server:c879b01
+    image: vahkjsdf/grion-server:${IMAGE_TAG:-latest}
     ports:
       - "8080:8080"
     environment:

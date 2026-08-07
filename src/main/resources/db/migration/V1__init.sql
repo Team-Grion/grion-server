@@ -1,5 +1,3 @@
-SET FOREIGN_KEY_CHECKS = 0;
-
 CREATE TABLE `user` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 일시',
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '사용자 PK',
@@ -75,5 +73,3 @@ CREATE TABLE `pet_personality` (
   PRIMARY KEY (`pet_id`, `personality`),
   CONSTRAINT `FK_PET_PERSONALITY_PET` FOREIGN KEY (`pet_id`) REFERENCES `pet` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-SET FOREIGN_KEY_CHECKS = 1;

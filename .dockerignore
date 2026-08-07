@@ -1,0 +1,10 @@
+.git
+.github
+.gradle
+.idea
+.kotlin
+build
+*.iml
+HELP.md
+.env
+src/main/resources/application-local.yaml

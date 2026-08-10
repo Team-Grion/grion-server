@@ -4,10 +4,13 @@ import com.project.grionserver.domain.common.entity.BaseTimeEntity
 import com.project.grionserver.domain.user.entity.User
 import jakarta.persistence.*
 import org.hibernate.annotations.Comment
+import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "pet")
+@SQLRestriction("deleted_at IS NULL")
 class Pet(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -57,5 +60,9 @@ class Pet(
 
     @Column(name = "is_shared", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Comment("공개 여부")
-    var isShared: Boolean = false
+    var isShared: Boolean = false,
+
+    @Column(name = "deleted_at")
+    @Comment("삭제 일시")
+    var deletedAt: LocalDateTime? = null
 ) : BaseTimeEntity()

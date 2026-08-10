@@ -5,6 +5,7 @@ import com.project.grionserver.domain.pet.entity.Pet
 import com.project.grionserver.domain.user.entity.User
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
@@ -17,6 +18,18 @@ interface MessageRepository : JpaRepository<Message, Long> {
 
     // 특정 반려동물에게 온 메시지 개수
     fun countByPet(pet: Pet): Long
+
+    // 특정 반려동물의 쪽지를 일괄 소프트 삭제
+    @Modifying
+    @Query(
+        """
+        UPDATE Message m
+        SET m.deletedAt = :now
+        WHERE m.pet = :pet
+          AND m.deletedAt IS NULL
+        """
+    )
+    fun softDeleteByPet(pet: Pet, now: LocalDateTime): Int
 
     // 특정 유저가 보낸 메시지를 최신순으로 조회 (pet 연관관계 함께 조회)
     @EntityGraph(attributePaths = ["pet"])

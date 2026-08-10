@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -252,7 +253,7 @@ class PetService(
     }
 
     fun createLetter(petId: Long, userId: Long, request: PetLetterCreateRequest): PetLetterCreateResponse {
-        val pet = petRepository.findByIdAndIsSharedTrue(petId)
+        val pet = petRepository.findByIdAndIsSharedTrueForUpdate(petId)
             ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 
         val sender = userRepository.findById(userId)
@@ -269,6 +270,15 @@ class PetService(
         )
 
         return PetLetterCreateResponse(letterId = message.id, createdAt = message.createdAt)
+    }
+
+    fun deleteMyMemorial(petId: Long, userId: Long) {
+        val pet = petRepository.findByIdAndUserIdForUpdate(petId, userId)
+            ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
+
+        val now = LocalDateTime.now()
+        messageRepository.softDeleteByPet(pet, now)
+        pet.deletedAt = now
     }
 
     fun getMyMemorials(userId: Long): PetPrivateMemorialListResponse {

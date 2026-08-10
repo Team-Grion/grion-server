@@ -277,7 +277,7 @@ class PetService(
             ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 
         val now = LocalDateTime.now()
-        messageRepository.findAllByPetOrderByCreatedAtDesc(pet).forEach { it.deletedAt = now }
+        messageRepository.softDeleteByPet(pet, now)
         pet.deletedAt = now
     }
 

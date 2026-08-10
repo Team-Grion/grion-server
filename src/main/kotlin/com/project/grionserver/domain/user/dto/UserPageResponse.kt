@@ -16,5 +16,6 @@ data class UserLetterSummary(
     val petName: String?,
     val isAnonymous: Boolean,
     val content: String,
+    val isPetPublic: Boolean,
     val createdAt: LocalDateTime?
 )

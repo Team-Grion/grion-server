@@ -25,6 +25,7 @@ class UserService(
                 petName = message.pet.name,
                 isAnonymous = message.isAnonymous,
                 content = message.content,
+                isPetPublic = message.pet.isShared,
                 createdAt = message.createdAt
             )
         }

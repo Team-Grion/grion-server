@@ -4,6 +4,7 @@ import com.project.grionserver.domain.common.entity.BaseTimeEntity
 import com.project.grionserver.domain.user.entity.User
 import jakarta.persistence.*
 import org.hibernate.annotations.Comment
+import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -11,6 +12,7 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "pet")
 @SQLRestriction("deleted_at IS NULL")
+@DynamicUpdate
 class Pet(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

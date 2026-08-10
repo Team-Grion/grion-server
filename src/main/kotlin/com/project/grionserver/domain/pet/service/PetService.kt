@@ -253,7 +253,7 @@ class PetService(
     }
 
     fun createLetter(petId: Long, userId: Long, request: PetLetterCreateRequest): PetLetterCreateResponse {
-        val pet = petRepository.findByIdAndIsSharedTrue(petId)
+        val pet = petRepository.findByIdAndIsSharedTrueForUpdate(petId)
             ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 
         val sender = userRepository.findById(userId)
@@ -273,7 +273,7 @@ class PetService(
     }
 
     fun deleteMyMemorial(petId: Long, userId: Long) {
-        val pet = petRepository.findByIdAndUserId(petId, userId)
+        val pet = petRepository.findByIdAndUserIdForUpdate(petId, userId)
             ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 
         val now = LocalDateTime.now()

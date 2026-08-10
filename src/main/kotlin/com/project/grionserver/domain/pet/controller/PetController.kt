@@ -104,6 +104,16 @@ class PetController(private val petService: PetService) {
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
+    @Operation(summary = "개인 추모 공간 삭제", description = "petId에 해당하는 개인 추모 공간을 삭제합니다.")
+    @DeleteMapping("/me/{petId}/delete")
+    fun deleteMyMemorial(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable petId: Long
+    ): ResponseEntity<ApiResponse<Unit?>> {
+        petService.deleteMyMemorial(petId, userId)
+        return ResponseEntity.ok(ApiResponse.success(null))
+    }
+
     @Operation(summary = "쪽지 목록 조회", description = "petId에 해당하는 추모 공간에 도착한 쪽지 목록을 조회합니다.")
     @GetMapping("/me/{petId}/letters")
     fun getLetters(

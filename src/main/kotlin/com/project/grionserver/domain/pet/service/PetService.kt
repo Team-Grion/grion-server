@@ -82,7 +82,10 @@ class PetService(
             AiImageGenerationRequestedEvent(
                 taskId = task.id,
                 sourceImageUrl = imageUrl,
-                prompt = buildPrompt(species, request)
+                species = species,
+                breed = request.breed,
+                personalities = request.personalities,
+                background = request.background
             )
         )
 
@@ -148,16 +151,6 @@ class PetService(
         pet.birthday = request.birthDate
         pet.deathDate = request.deathDate
         pet.memories = request.memory
-    }
-
-    private fun buildPrompt(species: Species, request: PetCreateRequest): String {
-        val speciesText = when (species) {
-            Species.CAT -> "고양이"
-            Species.DOG -> "강아지"
-        }
-        val personalityText = request.personalities.joinToString(", ")
-        return "품종이 ${request.breed}인 ${speciesText}이미지를 생성해줘. " +
-                "성격은 ${personalityText}. 배경은 ${request.background}."
     }
 
     fun getPetStatus(petId: Long, userId: Long): PetStatusResponse {

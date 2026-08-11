@@ -54,10 +54,11 @@ class AiImageGenerationService(
         }
         val personalityText = event.personalities.joinToString(", ")
         val ambiguousBreeds = setOf("믹스견", "믹스묘", "기타")
-        val breedText = if (event.breed in ambiguousBreeds) {
+        val breed = event.breed.trim()
+        val breedText = if (breed in ambiguousBreeds) {
             ""
         } else {
-            " 품종은 ${event.breed}이며, "
+            " 품종은 ${breed}이며, "
         }
 
         return "이 ${speciesText}의 품종 특징(털색, 무늬, 귀·얼굴 형태 등)은 사진을 최우선으로 유지해줘." +

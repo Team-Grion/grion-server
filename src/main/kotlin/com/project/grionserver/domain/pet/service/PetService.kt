@@ -204,7 +204,7 @@ class PetService(
                 aiImageUrl = latestImageTaskByPetId[pet.id]?.resultUrl,
                 birthDate = pet.birthday,
                 deathDate = pet.deathDate,
-                introduction = pet.backgroundText,
+                introduction = pet.memories,
                 personalities = pet.personalities.toList(),
                 todayMessageCount = todayMessageCountByPetId[pet.id] ?: 0L,
                 totalMessageCount = totalMessageCountByPetId[pet.id] ?: 0L

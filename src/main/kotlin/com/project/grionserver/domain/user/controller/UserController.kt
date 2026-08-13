@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -23,5 +25,15 @@ class UserController(private val userService: UserService) {
     ): ResponseEntity<ApiResponse<UserPageResponse>> {
         val response = userService.getMyPage(userId)
         return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
+    @Operation(summary = "내가 쓴 쪽지 삭제", description = "letterId에 해당하는, 본인이 작성한 쪽지를 삭제합니다.")
+    @DeleteMapping("/me/letters/{letterId}/delete")
+    fun deleteMyLetter(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable letterId: Long
+    ): ResponseEntity<ApiResponse<Unit?>> {
+        userService.deleteMyLetter(letterId, userId)
+        return ResponseEntity.ok(ApiResponse.success(null))
     }
 }

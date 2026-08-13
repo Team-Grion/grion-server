@@ -40,10 +40,7 @@ class UserService(
     }
 
     fun deleteMyLetter(letterId: Long, userId: Long) {
-        val user = userRepository.findById(userId)
-            .orElseThrow { NotFoundException("사용자를 찾을 수 없습니다.") }
-
-        val message = messageRepository.findByIdAndSender(letterId, user)
+        val message = messageRepository.findByIdAndSenderId(letterId, userId)
             ?: throw NotFoundException("쪽지를 찾을 수 없습니다.")
 
         messageRepository.delete(message)

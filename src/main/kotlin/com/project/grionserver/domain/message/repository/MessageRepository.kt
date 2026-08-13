@@ -36,7 +36,7 @@ interface MessageRepository : JpaRepository<Message, Long> {
     fun findAllBySenderOrderByCreatedAtDesc(sender: User): List<Message>
 
     // 특정 유저가 보낸 메시지 단건 조회
-    fun findByIdAndSender(id: Long, sender: User): Message?
+    fun findByIdAndSenderId(id: Long, senderId: Long): Message?
 
     // 공개된 추모 공간에 오늘 온 메시지 개수
     @Query("SELECT COUNT(m) FROM Message m WHERE m.pet.isShared = true AND m.createdAt >= :start AND m.createdAt < :end")

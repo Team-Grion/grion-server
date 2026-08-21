@@ -19,6 +19,8 @@ import com.project.grionserver.domain.pet.dto.PetMemorialUpdateResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialUpdateRequest
 import com.project.grionserver.domain.pet.dto.PetMemorialDetailResponse
 import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
+import com.project.grionserver.domain.pet.dto.PetInfoUpdateRequest
+import com.project.grionserver.domain.pet.dto.PetInfoUpdateResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialPublicDetailResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialPublicListResponse
 import com.project.grionserver.domain.pet.dto.PetMemorialPublicSummary
@@ -101,6 +103,66 @@ class PetService(
         petRepository.saveAndFlush(pet)
 
         return toMemorialDetailResponse(pet)
+    }
+
+    fun updatePetInfo(
+        petId: Long,
+        userId: Long,
+        petImage: MultipartFile?,
+        request: PetInfoUpdateRequest
+    ): PetInfoUpdateResponse {
+        val pet = petRepository.findByIdAndUserId(petId, userId)
+            ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
+
+        request.breed?.let { pet.breed = it }
+        request.personalities?.let { pet.personalities = it.toMutableList() }
+        request.background?.let { pet.backgroundText = it }
+
+        val shouldRegenerateImage = petImage != null ||
+                request.breed != null ||
+                request.personalities != null ||
+                request.background != null
+
+        var imageStatus: String? = null
+
+        if (shouldRegenerateImage) {
+            val sourceImageUrl = if (petImage != null) {
+                val uploadedUrl = falStorageService.upload(petImage)
+                petImageRepository.save(PetImage(pet = pet, imageUrl = uploadedUrl, isMain = true))
+                uploadedUrl
+            } else {
+                petImageRepository.findFirstByPetAndIsMainTrueOrderByIdDesc(pet)?.imageUrl
+                    ?: throw NotFoundException("원본 사진을 찾을 수 없습니다.")
+            }
+
+            val task = aiImageTaskRepository.save(
+                AiImageTask(pet = pet, requestId = UUID.randomUUID().toString(), status = "PENDING")
+            )
+
+            eventPublisher.publishEvent(
+                AiImageGenerationRequestedEvent(
+                    taskId = task.id,
+                    sourceImageUrl = sourceImageUrl,
+                    species = pet.species,
+                    breed = pet.breed,
+                    personalities = pet.personalities.toList(),
+                    background = pet.backgroundText ?: ""
+                )
+            )
+
+            imageStatus = task.status
+        }
+
+        petRepository.saveAndFlush(pet)
+
+        return PetInfoUpdateResponse(
+            petId = pet.id,
+            species = pet.species.name,
+            breed = pet.breed,
+            personalities = pet.personalities.toList(),
+            background = pet.backgroundText,
+            imageStatus = imageStatus
+        )
     }
 
     private fun toMemorialDetailResponse(pet: Pet): PetMemorialUpdateResponse {

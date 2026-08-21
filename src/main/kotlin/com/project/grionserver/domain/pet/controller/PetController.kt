@@ -3,6 +3,8 @@ package com.project.grionserver.domain.pet.controller
 import com.project.grionserver.domain.pet.dto.PetAdditionalInfoRequest
 import com.project.grionserver.domain.pet.dto.PetCreateRequest
 import com.project.grionserver.domain.pet.dto.PetCreateResponse
+import com.project.grionserver.domain.pet.dto.PetInfoUpdateRequest
+import com.project.grionserver.domain.pet.dto.PetInfoUpdateResponse
 import com.project.grionserver.domain.pet.dto.PetLetterListResponse
 import com.project.grionserver.domain.pet.dto.PetLetterCreateRequest
 import com.project.grionserver.domain.pet.dto.PetLetterCreateResponse
@@ -59,6 +61,27 @@ class PetController(private val petService: PetService) {
         @RequestBody request: PetMemorialUpdateRequest
     ): ResponseEntity<ApiResponse<PetMemorialUpdateResponse>> {
         val response = petService.updateMemorial(petId, userId, request)
+        return ResponseEntity.ok(ApiResponse.success(response))
+    }
+
+    @Operation(summary = "추모 공간 생성 정보 수정", description = "품종, 성격, 배경, 원본 사진을 수정합니다. " +
+            "\n종(species)은 수정할 수 없습니다. petImageUrl을 첨부하지 않으면 기존에 저장된 원본 사진으로 재생성합니다. " +
+            "변경된 필드가 없으면 이미지 재생성이 이루어지지 않으며, 이 경우 imageStatus는 null로 반환됩니다.")
+    @PatchMapping("/me/{petId}/info", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun updatePetInfo(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable petId: Long,
+        @RequestPart("petImageUrl", required = false) petImage: MultipartFile?,
+        @RequestParam(required = false) breed: String?,
+        @RequestParam(required = false) personalities: List<String>?,
+        @RequestParam(required = false) background: String?
+    ): ResponseEntity<ApiResponse<PetInfoUpdateResponse>> {
+        val request = PetInfoUpdateRequest(
+            breed = breed,
+            personalities = personalities,
+            background = background
+        )
+        val response = petService.updatePetInfo(petId, userId, petImage, request)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 

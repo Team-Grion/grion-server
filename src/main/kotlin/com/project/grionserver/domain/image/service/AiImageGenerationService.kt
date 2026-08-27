@@ -53,17 +53,11 @@ class AiImageGenerationService(
             Species.DOG -> "강아지"
         }
         val personalityText = event.personalities.joinToString(", ")
-        val ambiguousBreeds = setOf("믹스견", "믹스묘", "기타")
-        val breed = event.breed.trim()
-        val breedText = if (breed in ambiguousBreeds) {
-            ""
-        } else {
-            " 품종은 ${breed}이며, "
-        }
 
-        return "이 ${speciesText}의 품종 특징(털색, 무늬, 귀·얼굴 형태 등)은 사진을 최우선으로 유지해줘." +
-                breedText +
-                " 자세와 구도, 표정은 성격과 배경에 어울리게 표현해줘." +
+        return "너는 15년 경력의 반려동물 전문 포토그래퍼야. 행복했던 순간을 자연스럽게 담아내는 게 특기고, 지금 이 ${speciesText}를 직접 촬영했다고 생각하고 편집해줘." +
+                " 사진 속 대상의 생김새(털색, 무늬, 눈동자 색, 귀와 얼굴 형태, 체형 등)와 이 개체만의 고유한 비대칭적 특징을 최대한 그대로 유지해줘." +
+                " 전형적인 품종 표준 이미지처럼 더 예쁘게 다듬거나 이상화하지 마." +
+                " 자세와 구도, 표정은 성격과 배경에 어울리게 자연스럽게 표현해줘. 실제 카메라로 찍은 듯한 자연스러운 스냅샷처럼 만들어줘." +
                 " 성격은 ${personalityText}. 배경은 ${event.background}."
     }
 }

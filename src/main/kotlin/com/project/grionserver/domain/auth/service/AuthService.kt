@@ -52,17 +52,21 @@ class AuthService(
     fun reissue(refreshToken: String): ReissueResponse {
         val userId = jwtProvider.getUserIdFromRefreshToken(refreshToken)
 
-        val user = userRepository.findById(userId)
-            .orElseThrow { UnauthorizedException("리프레시 토큰의 유저 정보가 올바르지 않습니다.") }
-
-        if (user.refreshToken != hashToken(refreshToken)) {
-            throw UnauthorizedException("리프레시 토큰 정보가 일치하지 않습니다.")
+        if (!userRepository.existsById(userId)) {
+            throw UnauthorizedException("리프레시 토큰의 유저 정보가 올바르지 않습니다.")
         }
 
-        val newAccessToken = jwtProvider.createAccessToken(user.id)
-        val newRefreshToken = jwtProvider.createRefreshToken(user.id)
-        user.refreshToken = hashToken(newRefreshToken)
-        userRepository.save(user)
+        val newAccessToken = jwtProvider.createAccessToken(userId)
+        val newRefreshToken = jwtProvider.createRefreshToken(userId)
+
+        val updatedRows = userRepository.updateRefreshTokenIfMatches(
+            userId = userId,
+            oldHash = hashToken(refreshToken),
+            newHash = hashToken(newRefreshToken)
+        )
+        if (updatedRows == 0) {
+            throw UnauthorizedException("리프레시 토큰 정보가 일치하지 않습니다.")
+        }
 
         return ReissueResponse(accessToken = newAccessToken, refreshToken = newRefreshToken)
     }

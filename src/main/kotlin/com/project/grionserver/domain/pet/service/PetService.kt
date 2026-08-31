@@ -310,7 +310,7 @@ class PetService(
     }
 
     fun createLetter(petId: Long, userId: Long, request: PetLetterCreateRequest): PetLetterCreateResponse {
-        val pet = petRepository.findByIdAndIsSharedTrueForUpdate(petId)
+        petRepository.findByIdAndIsSharedTrue(petId)
             ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 
         val sender = userRepository.findById(userId)
@@ -319,6 +319,9 @@ class PetService(
         if (moderationService.isViolated(request.content)) {
             throw IllegalArgumentException("부적절한 내용이 감지되어 전송되지 않았어요")
         }
+
+        val pet = petRepository.findByIdAndIsSharedTrueForUpdate(petId)
+            ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 
         val message = messageRepository.save(
             Message(

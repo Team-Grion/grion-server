@@ -18,6 +18,7 @@ import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.service.PetService
 import com.project.grionserver.global.response.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirements
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.MediaType
@@ -149,6 +150,7 @@ class PetController(private val petService: PetService) {
 
     @Operation(summary = "공개 추모 공간 목록 조회", description = "공개된 추모 공간 목록을 조회합니다. species: 전체 - `ALL` (생략시 ALL로 들어감), " +
             "강아지: `DOG`, 고양이: `CAT`")
+    @SecurityRequirements
     @GetMapping("/public")
     fun getPublicMemorials(
         @RequestParam(defaultValue = "ALL") species: String
@@ -158,6 +160,7 @@ class PetController(private val petService: PetService) {
     }
 
     @Operation(summary = "공개 추모 공간 상세 조회", description = "petId에 해당하는 공개 추모 공간의 상세 정보를 조회합니다.")
+    @SecurityRequirements
     @GetMapping("/public/{petId}")
     fun getPublicMemorialDetail(
         @PathVariable petId: Long

@@ -22,5 +22,9 @@ class User(
 
     @Column(name = "profile_image_url", columnDefinition = "TEXT")
     @Comment("카카오 프로필 이미지 URL")
-    var profileImageUrl: String? = null
+    var profileImageUrl: String? = null,
+
+    @Column(name = "refresh_token", columnDefinition = "TEXT")
+    @Comment("발급된 리프레시 토큰")
+    var refreshToken: String? = null
 ) : BaseTimeEntity()

@@ -300,7 +300,7 @@ class PetService(
         val letters = messageRepository.findAllByPetOrderByCreatedAtDesc(pet).map { message ->
             PetLetterSummary(
                 letterId = message.id,
-                senderName = if (message.isAnonymous) "익명" else message.sender.nickname,
+                senderName = if (message.isAnonymous) "익명" else message.sender?.nickname ?: "익명",
                 content = message.content,
                 createdAt = message.createdAt
             )
@@ -309,12 +309,15 @@ class PetService(
         return PetLetterListResponse(petId = pet.id, letters = letters)
     }
 
-    fun createLetter(petId: Long, userId: Long, request: PetLetterCreateRequest): PetLetterCreateResponse {
+
+    fun createLetter(petId: Long, userId: Long?, request: PetLetterCreateRequest): PetLetterCreateResponse {
         petRepository.findByIdAndIsSharedTrue(petId)
             ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 
-        val sender = userRepository.findById(userId)
-            .orElseThrow { NotFoundException("사용자를 찾을 수 없습니다.") }
+        val sender = userId?.let {
+            userRepository.findById(it)
+                .orElseThrow { NotFoundException("사용자를 찾을 수 없습니다.") }
+        }
 
         if (moderationService.isViolated(request.content)) {
             throw IllegalArgumentException("부적절한 내용이 감지되어 전송되지 않았어요")
@@ -328,7 +331,7 @@ class PetService(
                 pet = pet,
                 sender = sender,
                 content = request.content,
-                isAnonymous = request.isAnonymous,
+                isAnonymous = sender == null || request.isAnonymous,
                 status = "APPROVED"
             )
         )

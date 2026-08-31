@@ -18,6 +18,7 @@ import com.project.grionserver.domain.pet.dto.PetStatusResponse
 import com.project.grionserver.domain.pet.service.PetService
 import com.project.grionserver.global.response.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirements
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.MediaType
@@ -149,6 +150,7 @@ class PetController(private val petService: PetService) {
 
     @Operation(summary = "공개 추모 공간 목록 조회", description = "공개된 추모 공간 목록을 조회합니다. species: 전체 - `ALL` (생략시 ALL로 들어감), " +
             "강아지: `DOG`, 고양이: `CAT`")
+    @SecurityRequirements
     @GetMapping("/public")
     fun getPublicMemorials(
         @RequestParam(defaultValue = "ALL") species: String
@@ -158,6 +160,7 @@ class PetController(private val petService: PetService) {
     }
 
     @Operation(summary = "공개 추모 공간 상세 조회", description = "petId에 해당하는 공개 추모 공간의 상세 정보를 조회합니다.")
+    @SecurityRequirements
     @GetMapping("/public/{petId}")
     fun getPublicMemorialDetail(
         @PathVariable petId: Long
@@ -166,10 +169,12 @@ class PetController(private val petService: PetService) {
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
-    @Operation(summary = "쪽지 작성", description = "공개된 추모 공간에 쪽지를 작성합니다.")
+    @Operation(summary = "쪽지 작성", description = "공개된 추모 공간에 쪽지를 작성합니다. " +
+            "로그인하지 않은 경우에도 작성할 수 있으며, 이 경우 무조건 익명으로 처리됩니다.")
+    @SecurityRequirements
     @PostMapping("/public/{petId}/letter")
     fun createLetter(
-        @AuthenticationPrincipal userId: Long,
+        @AuthenticationPrincipal userId: Long?,
         @PathVariable petId: Long,
         @Valid @RequestBody request: PetLetterCreateRequest
     ): ResponseEntity<ApiResponse<PetLetterCreateResponse>> {

@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository
 interface PetImageRepository : JpaRepository<PetImage, Long> {
     // 특정 반려동물 이미지들 조회
     fun findAllByPet(pet: Pet): List<PetImage>
+
+    // 가장 최근에 저장된 원본 사진 조회
+    fun findFirstByPetAndIsMainTrueOrderByIdDesc(pet: Pet): PetImage?
 }

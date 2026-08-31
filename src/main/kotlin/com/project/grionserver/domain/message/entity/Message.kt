@@ -5,9 +5,12 @@ import com.project.grionserver.domain.pet.entity.Pet
 import com.project.grionserver.domain.user.entity.User
 import jakarta.persistence.*
 import org.hibernate.annotations.Comment
+import org.hibernate.annotations.SQLRestriction
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "message")
+@SQLRestriction("deleted_at IS NULL")
 class Message(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -32,5 +35,9 @@ class Message(
 
     @Column(name = "status", nullable = false, length = 20)
     @Comment("메시지 상태")
-    var status: String
+    var status: String,
+
+    @Column(name = "deleted_at")
+    @Comment("삭제 일시")
+    var deletedAt: LocalDateTime? = null
 ) : BaseCreatedAtEntity()

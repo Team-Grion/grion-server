@@ -1,0 +1,14 @@
+FROM gradle:9.4.1-jdk17 AS builder
+WORKDIR /app
+COPY . .
+RUN gradle bootJar --no-daemon -x test
+
+FROM eclipse-temurin:17-jre-jammy
+ENV TZ=Asia/Seoul
+WORKDIR /app
+COPY --from=builder /app/build/libs/*.jar app.jar
+RUN useradd --system --create-home --shell /usr/sbin/nologin appuser \
+    && chown -R appuser:appuser /app
+USER appuser
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -169,10 +169,12 @@ class PetController(private val petService: PetService) {
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
-    @Operation(summary = "쪽지 작성", description = "공개된 추모 공간에 쪽지를 작성합니다.")
+    @Operation(summary = "쪽지 작성", description = "공개된 추모 공간에 쪽지를 작성합니다. " +
+            "로그인하지 않은 경우에도 작성할 수 있으며, 이 경우 무조건 익명으로 처리됩니다.")
+    @SecurityRequirements
     @PostMapping("/public/{petId}/letter")
     fun createLetter(
-        @AuthenticationPrincipal userId: Long,
+        @AuthenticationPrincipal userId: Long?,
         @PathVariable petId: Long,
         @Valid @RequestBody request: PetLetterCreateRequest
     ): ResponseEntity<ApiResponse<PetLetterCreateResponse>> {

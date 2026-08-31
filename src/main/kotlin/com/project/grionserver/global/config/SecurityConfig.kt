@@ -33,6 +33,7 @@ class SecurityConfig(
                     .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                     .requestMatchers("/auth/**", "/error").permitAll()
                     .requestMatchers(HttpMethod.GET, "/memorials/public", "/memorials/public/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/memorials/public/*/letter").permitAll()
                     .anyRequest().authenticated()
             }
             .exceptionHandling { it.authenticationEntryPoint(jwtAuthenticationEntryPoint) }

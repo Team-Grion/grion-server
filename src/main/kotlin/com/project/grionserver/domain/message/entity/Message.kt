@@ -22,8 +22,8 @@ class Message(
     val pet: Pet,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id", nullable = false, foreignKey = ForeignKey(name = "FK_MESSAGE_USER"))
-    val sender: User,
+    @JoinColumn(name = "sender_id", nullable = true, foreignKey = ForeignKey(name = "FK_MESSAGE_USER"))
+    val sender: User?,
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     @Comment("메시지 본문")

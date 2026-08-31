@@ -310,7 +310,7 @@ class PetService(
     }
 
 
-    fun createLetter(petId: Long, userId: Long, request: PetLetterCreateRequest): PetLetterCreateResponse {
+    fun createLetter(petId: Long, userId: Long?, request: PetLetterCreateRequest): PetLetterCreateResponse {
         petRepository.findByIdAndIsSharedTrue(petId)
             ?: throw NotFoundException("반려동물을 찾을 수 없습니다.")
 

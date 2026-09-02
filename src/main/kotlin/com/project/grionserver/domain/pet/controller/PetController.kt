@@ -33,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile
 class PetController(private val petService: PetService) {
 
     @Operation(summary = "추모 공간 생성", description = "반려동물 사진과 정보를 받아 추모 공간을 생성합니다. " +
-            "종: 강아지는 DOG, 고양이는 CAT")
+            "종: 강아지는 DOG, 고양이는 CAT. 유저당 최대 10개까지 생성 가능합니다.")
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createPet(
         @AuthenticationPrincipal userId: Long,

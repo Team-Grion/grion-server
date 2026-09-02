@@ -35,6 +35,13 @@ class GlobalExceptionHandler {
             .body(ApiResponse.fail(e.message ?: "인증에 실패했습니다.", statusCode))
     }
 
+    @ExceptionHandler(ConflictException::class)
+    fun handleConflictException(e: ConflictException): ResponseEntity<ApiResponse<Unit?>> {
+        val statusCode = HttpStatus.CONFLICT.value()
+        return ResponseEntity.status(statusCode)
+            .body(ApiResponse.fail(e.message ?: "요청을 처리할 수 없는 상태입니다.", statusCode))
+    }
+
     @ExceptionHandler(BadGatewayException::class)
     fun handleBadGatewayException(e: BadGatewayException): ResponseEntity<ApiResponse<Unit?>> {
         val statusCode = HttpStatus.BAD_GATEWAY.value()

@@ -31,6 +31,7 @@ import com.project.grionserver.domain.pet.entity.Pet
 import com.project.grionserver.domain.pet.entity.Species
 import com.project.grionserver.domain.pet.repository.PetRepository
 import com.project.grionserver.domain.user.repository.UserRepository
+import com.project.grionserver.global.exception.ConflictException
 import com.project.grionserver.global.exception.NotFoundException
 import com.project.grionserver.global.service.FalStorageService
 import org.springframework.context.ApplicationEventPublisher
@@ -53,9 +54,17 @@ class PetService(
     private val eventPublisher: ApplicationEventPublisher,
     private val moderationService: ModerationService
 ) {
+    companion object {
+        private const val MAX_MEMORIAL_COUNT_PER_USER = 10
+    }
+
     fun createPet(image: MultipartFile, request: PetCreateRequest): PetCreateResponse {
-        val user = userRepository.findById(request.userId)
-            .orElseThrow { NotFoundException("사용자를 찾을 수 없습니다.") }
+        val user = userRepository.findByIdForUpdate(request.userId)
+            ?: throw NotFoundException("사용자를 찾을 수 없습니다.")
+
+        if (petRepository.countByUser(user) >= MAX_MEMORIAL_COUNT_PER_USER) {
+            throw ConflictException("추모 공간은 유저당 최대 ${MAX_MEMORIAL_COUNT_PER_USER}개까지 생성할 수 있습니다.")
+        }
 
         val imageUrl = falStorageService.upload(image)
         val species = Species.fromString(request.species)

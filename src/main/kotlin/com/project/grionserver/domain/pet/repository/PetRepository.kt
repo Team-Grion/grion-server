@@ -14,6 +14,9 @@ interface PetRepository : JpaRepository<Pet, Long> {
     // 특정 유저가 등록한 반려동물 목록 조회
     fun findAllByUser(user: User): List<Pet>
 
+    // 특정 유저가 등록한 추모 공간 개수
+    fun countByUser(user: User): Long
+
     // 공개된 추모 페이지 목록 조회
     fun findAllByIsSharedTrue(): List<Pet>
 

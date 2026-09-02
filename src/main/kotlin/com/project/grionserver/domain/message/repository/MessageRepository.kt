@@ -42,6 +42,10 @@ interface MessageRepository : JpaRepository<Message, Long> {
     @Query("SELECT COUNT(m) FROM Message m WHERE m.pet.isShared = true AND m.createdAt >= :start AND m.createdAt < :end")
     fun countTodayMessagesForPublicMemorials(start: LocalDateTime, end: LocalDateTime): Long
 
+    // 오늘 쪽지를 받은 공개 추모 공간 개수
+    @Query("SELECT COUNT(DISTINCT m.pet.id) FROM Message m WHERE m.pet.isShared = true AND m.createdAt >= :start AND m.createdAt < :end")
+    fun countTodayMemorialsWithMessages(start: LocalDateTime, end: LocalDateTime): Long
+
     // 여러 반려동물의 오늘 메시지 개수를 한 번에 집계
     @Query(
         """

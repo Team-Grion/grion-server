@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
 
 @Repository
 interface PetRepository : JpaRepository<Pet, Long> {
@@ -36,8 +35,4 @@ interface PetRepository : JpaRepository<Pet, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Pet p WHERE p.id = :id AND p.isShared = true")
     fun findByIdAndIsSharedTrueForUpdate(id: Long): Pet?
-
-    // 오늘 새로 등록된 공개 추모 공간 개수
-    @Query("SELECT COUNT(p) FROM Pet p WHERE p.isShared = true AND p.createdAt >= :start AND p.createdAt < :end")
-    fun countTodayPublicMemorials(start: LocalDateTime, end: LocalDateTime): Long
 }

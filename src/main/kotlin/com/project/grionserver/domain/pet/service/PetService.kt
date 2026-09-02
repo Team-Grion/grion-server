@@ -59,8 +59,8 @@ class PetService(
     }
 
     fun createPet(image: MultipartFile, request: PetCreateRequest): PetCreateResponse {
-        val user = userRepository.findById(request.userId)
-            .orElseThrow { NotFoundException("사용자를 찾을 수 없습니다.") }
+        val user = userRepository.findByIdForUpdate(request.userId)
+            ?: throw NotFoundException("사용자를 찾을 수 없습니다.")
 
         if (petRepository.countByUser(user) >= MAX_MEMORIAL_COUNT_PER_USER) {
             throw ConflictException("추모 공간은 유저당 최대 ${MAX_MEMORIAL_COUNT_PER_USER}개까지 생성할 수 있습니다.")

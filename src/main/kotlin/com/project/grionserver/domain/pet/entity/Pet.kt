@@ -57,8 +57,12 @@ class Pet(
     var backgroundText: String? = null,
 
     @Column(name = "memories", columnDefinition = "TEXT")
-    @Comment("반려동물과의 추억 기록")
+    @Comment("한줄 소개 (isPublic과 함께 노출)")
     var memories: String? = null,
+
+    @Column(name = "memory", columnDefinition = "TEXT")
+    @Comment("함께한 추억 (비공개, 화면 미노출)")
+    var memory: String? = null,
 
     @Column(name = "is_shared", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Comment("공개 여부")

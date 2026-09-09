@@ -223,7 +223,7 @@ class PetService(
         pet.name = request.petName
         pet.birthday = request.birthDate
         pet.deathDate = request.deathDate
-        pet.memories = request.memory
+        pet.memory = request.memory
     }
 
     fun getPetStatus(petId: Long, userId: Long): PetStatusResponse {

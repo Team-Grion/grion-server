@@ -17,11 +17,11 @@ interface PetRepository : JpaRepository<Pet, Long> {
     // 특정 유저가 등록한 추모 공간 개수
     fun countByUser(user: User): Long
 
-    // 공개된 추모 페이지 목록 조회
-    fun findAllByIsSharedTrue(): List<Pet>
+    // 공개된 추모 페이지 목록 조회 (최신순)
+    fun findAllByIsSharedTrueOrderByCreatedAtDesc(): List<Pet>
 
-    // 공개된 추모 페이지 목록 조회
-    fun findAllByIsSharedTrueAndSpecies(species: Species): List<Pet>
+    // 공개된 추모 페이지 목록 조회 (최신순)
+    fun findAllByIsSharedTrueAndSpeciesOrderByCreatedAtDesc(species: Species): List<Pet>
 
     // 공개된 추모 페이지 단건 조회
     fun findByIdAndIsSharedTrue(id: Long): Pet?

@@ -238,9 +238,9 @@ class PetService(
 
     fun getPublicMemorials(species: String): PetMemorialPublicListResponse {
         val pets = if (species.equals("ALL", ignoreCase = true)) {
-            petRepository.findAllByIsSharedTrue()
+            petRepository.findAllByIsSharedTrueOrderByCreatedAtDesc()
         } else {
-            petRepository.findAllByIsSharedTrueAndSpecies(Species.fromString(species))
+            petRepository.findAllByIsSharedTrueAndSpeciesOrderByCreatedAtDesc(Species.fromString(species))
         }
 
         val startOfToday = LocalDate.now().atStartOfDay()
